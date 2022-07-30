@@ -157,6 +157,12 @@
                     {% endif %}
                 </select>
             </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <label>Wipes</label>
+                    <input type="number" class="form-control" name="wipes" value="{{ UserData['Wipes'] }}">
+                </div>
+            </div>
             {% if ShowIPs %}
             <div class="form-group" id="iptext">
                 <b>IP: </b>{{ UserData['Ip'] }}

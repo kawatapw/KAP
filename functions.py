@@ -785,7 +785,7 @@ def UserData(UserID):
     Data = GetUser(UserID)
     mycursor.execute("SELECT userpage_content, user_color, username_aka FROM users_stats WHERE id = %s LIMIT 1", (UserID,))# Req 1
     Data1 = mycursor.fetchone()
-    mycursor.execute("SELECT email, register_datetime, privileges, notes, donor_expire, silence_end, silence_reason, ban_datetime, bypass_hwid, ban_reason FROM users WHERE id = %s LIMIT 1", (UserID,))
+    mycursor.execute("SELECT email, register_datetime, privileges, notes, donor_expire, silence_end, silence_reason, ban_datetime, bypass_hwid, ban_reason, wipes FROM users WHERE id = %s LIMIT 1", (UserID,))
     Data2 = mycursor.fetchone()
     #Fetches the IP
     mycursor.execute("SELECT ip FROM ip_user WHERE userid = %s LIMIT 1", (UserID,))
@@ -823,6 +823,7 @@ def UserData(UserID):
     Data["PrivName"] = PrivData[0]
     Data["BypassHWID"] = Data2[8]
     Data["BanReason"] = Data2[9]
+    Data["Wipes"] = Data2[10]
 
     Data["HasSupporter"] = Data["Privileges"] & 4
     Data["DonorExpireStr"] = TimeToTimeAgo(Data["DonorExpire"])
@@ -929,6 +930,12 @@ def ApplyUserEdit(form, session):
     Notes = form.get("notes", False)
     Privilege = form.get("privilege", False)
     HWIDBypass = form.get("hwid_bypass", False) == "1"
+    Wipes = form.get("wipes", False)
+
+    # Check if wipes count value is valid
+    valueValid = 0 <= int(Wipes) <= 3
+    if valueValid == False:
+        raise NameError
 
     if not UserId or not Username:
         print("Yo you seriously messed up the form")
@@ -1272,7 +1279,7 @@ def ResUnTrict(id : int, note: str = None, reason: str = None):
         # )
         
         # for bmap_md5, in recalc_maps: calc_first_place(bmap_md5)
-        
+
     UpdateBanStatus(id)
     mydb.commit()
     return TheReturn
