@@ -893,6 +893,39 @@ def RAPFetch(page = 1):
         LogArray.append(TheLog)
     return LogArray
 
+def WipeLogsFetch(id):
+    """Fetches Wipe Logs."""
+    mycursor.execute("SELECT * FROM users_wipes WHERE userid = %s ORDER BY id DESC", (id,))
+    Data = mycursor.fetchall()
+
+    #log structure
+    #[
+    #    {
+    #        "LogId" : 1337,
+    #        "AccountData" : 1000,
+    #        "Text" : "did a thing",
+    #        "Via" : "RealistikPanel",
+    #        "Time" : 18932905234
+    #    }
+    #]
+
+    LogArray = []
+    for log in Data:
+        # Get mod username
+        ModUsername = (GetUser(log[2])["Username"])
+
+        #we making it into cool dicts
+        #getting the acc data
+        TheLog = {
+            "LogId" : log[0],
+            "ModId": log[2],
+            "ModUsername": ModUsername,
+            "Time" : TimestampConverter(log[3], 2),
+            "Reason" : str(log[4])
+        }
+        LogArray.append(TheLog)
+    return LogArray
+
 def GetCFullName(ISO3166):
     """Gets the full name of the country provided."""
     Country = pycountry.countries.get(alpha_2=ISO3166)

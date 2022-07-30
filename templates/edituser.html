@@ -199,6 +199,7 @@
         This is the <b>danger zone!</b> These actions could mess up someone's profile if done without reason.
         <p></p>
         <div class="buttons">
+            <a href="/user/wipelogs/{{ UserData['Id'] }}" class="btn btn-success">Wipe Logs</a>
             <a href="/user/iplookup/{{ UserData['Ip'] }}" class="btn btn-success">IP Lookup</a>
             <a href="/changepass/{{ UserData['Id'] }}" class="btn btn-warning">Change Password</a>
             <a href="/donoraward/{{ UserData['Id'] }}" class="btn btn-warning">Award Donor</a>

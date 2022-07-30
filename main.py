@@ -189,6 +189,13 @@ def Logs(page):
     else:
          return NoPerm(session, request.path)
 
+@app.route("/user/wipelogs/<id>")
+def WipeLogs(id):
+    if HasPrivilege(session["AccountId"], 11):
+        return render_template("wipelogs.html", data=DashData(), session=session, title="Wipe Logs", config=UserConfig, Logs = WipeLogsFetch(id))
+    else:
+         return NoPerm(session, request.path)
+
 @app.route("/action/confirm/delete/<id>")
 def ConfirmDelete(id):
     """Confirms deletion of acc so accidents dont happen"""
