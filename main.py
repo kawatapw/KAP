@@ -216,12 +216,12 @@ def IPUsers(ip):
     else:
          return NoPerm(session, request.path)
      
-@app.route("/ban-logs/<page>")
-def BanLogs(page):
-    if HasPrivilege(session["AccountId"], 7):
-        return render_template("ban_logs.html", data=DashData(), session=session, title="Ban Logs", config=UserConfig, ban_logs = fetch_banlogs(int(page)-1), page=int(page), pages = ban_pages())
-    else:
-         return NoPerm(session, request.path)
+# @app.route("/ban-logs/<page>")
+# def BanLogs(page):
+#     if HasPrivilege(session["AccountId"], 7):
+#         return render_template("ban_logs.html", data=DashData(), session=session, title="Ban Logs", config=UserConfig, ban_logs = fetch_banlogs(int(page)-1), page=int(page), pages = ban_pages())
+#     else:
+#          return NoPerm(session, request.path)
 
 @app.route("/badges")
 def Badges():
