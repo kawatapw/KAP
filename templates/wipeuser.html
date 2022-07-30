@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="section-title">Wipe Account</h2>
+<div class="card">
+    <div class="card-header">
+        <h4>Wipe Account</h4>
+    </div>
+    <div class="card-body">
+        <form ction="/user/wipe/{{ UserData['Id'] }}" method="post">
+            <div class="form-group">
+                <label>Wipe Reason</label>
+                <textarea class="form-control" id="wipe_reason">{{ UserData["WipeReason"] }}</textarea>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-success" type="submit" name="">Apply!</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

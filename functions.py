@@ -1080,7 +1080,6 @@ def WipeVanilla(AccId):
             total_hits_taiko = 0,
             total_hits_ctb = 0,
             total_hits_mania = 0,
-            unrestricted_pp = 0,
             level_std = 0,
             level_taiko = 0,
             level_ctb = 0,
@@ -1100,36 +1099,31 @@ def WipeVanilla(AccId):
         WHERE
             id = %s
     """, (AccId,))
-    mycursor.execute("DELETE FROM scores WHERE userid = %s", (AccId,))
+    mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 0", (AccId,))
     mycursor.execute("DELETE FROM users_beatmap_playcount WHERE user_id = %s", (AccId,))
     mydb.commit()
 
 def WipeRelax(AccId):
     """Wipes the relax user data."""
     mycursor.execute("""UPDATE
-            rx_stats
+            users_stats_relax
         SET
             ranked_score_std = 0,
             playcount_std = 0,
             total_score_std = 0,
-            replays_watched_std = 0,
             ranked_score_taiko = 0,
             playcount_taiko = 0,
             total_score_taiko = 0,
-            replays_watched_taiko = 0,
             ranked_score_ctb = 0,
             playcount_ctb = 0,
             total_score_ctb = 0,
-            replays_watched_ctb = 0,
             ranked_score_mania = 0,
             playcount_mania = 0,
             total_score_mania = 0,
-            replays_watched_mania = 0,
             total_hits_std = 0,
             total_hits_taiko = 0,
             total_hits_ctb = 0,
             total_hits_mania = 0,
-            unrestricted_pp = 0,
             level_std = 0,
             level_taiko = 0,
             level_ctb = 0,
@@ -1149,8 +1143,8 @@ def WipeRelax(AccId):
         WHERE
             id = %s
     """, (AccId,))
-    mycursor.execute("DELETE FROM scores_relax WHERE userid = %s", (AccId,))
-    mycursor.execute("DELETE FROM rx_beatmap_playcount WHERE user_id = %s", (AccId,))
+    mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 1", (AccId,))
+    mycursor.execute("DELETE FROM users_beatmap_playcount WHERE user_id = %s", (AccId,))
     mydb.commit()
 
 def WipeAutopilot(AccId):
@@ -1178,7 +1172,6 @@ def WipeAutopilot(AccId):
             total_hits_taiko = 0,
             total_hits_ctb = 0,
             total_hits_mania = 0,
-            unrestricted_pp = 0,
             level_std = 0,
             level_taiko = 0,
             level_ctb = 0,
