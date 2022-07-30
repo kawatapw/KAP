@@ -519,15 +519,15 @@ def Restrict(id: int):
     else:
         return NoPerm(session, request.path)
 
-@app.route("/actions/freeze/<id>")
-def Freezee(id: int):
-    if HasPrivilege(session["AccountId"], 6):
-        Account = GetUser(id)
-        FreezeHandler(id)
-        RAPLog(session["AccountId"], f"has frozen the account {Account['Username']} ({id})")
-        return redirect(f"/user/edit/{id}")
-    else:
-         return NoPerm(session, request.path)
+# @app.route("/actions/freeze/<id>")
+# def Freezee(id: int):
+#     if HasPrivilege(session["AccountId"], 6):
+#         Account = GetUser(id)
+#         FreezeHandler(id)
+#         RAPLog(session["AccountId"], f"has frozen the account {Account['Username']} ({id})")
+#         return redirect(f"/user/edit/{id}")
+#     else:
+#          return NoPerm(session, request.path)
 
 @app.route("/actions/ban/<id>")
 def Ban(id: int):
