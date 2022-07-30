@@ -650,6 +650,23 @@ def KickClanRoute(AccountID):
         return redirect("/clans/1")
     return NoPerm(session, request.path)
 
+@app.route("/user/wipe/<id>", methods = ["GET", "POST"])
+def WipeUser(id):
+    if request.method == "GET":
+        if HasPrivilege(session["AccountId"], 11):
+            return render_template("wipeuser.html", data=DashData(), session=session, title="Wipe User", config=UserConfig, wipes=UserWipesData(id), AccountToBeWiped = GetUser(id))
+        else:
+             return NoPerm(session, request.path)
+    if request.method == "POST":
+        """The wipe action."""
+        if HasPrivilege(session["AccountId"], 11):
+            AccountToBeWiped = GetUser(id)
+            WipeAccount(request.form, session, id)
+            RAPLog(session["AccountId"], f"has wiped the user {AccountToBeWiped['Username']}")
+            return render_template("wipeuser.html", data=DashData(), session=session, title="Wipe User", config=UserConfig, wipes=UserWipesData(id), AccountToBeWiped = GetUser(id), success=f"User {AccountToBeWiped['Username']} has been successfully wiped!")
+        else:
+            return NoPerm(session, request.path)
+
 #error handlers
 @app.errorhandler(404)
 def NotFoundError(error):

@@ -139,6 +139,11 @@ def botch_sql_recovery() -> None:
     mycursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED")
 
 
+def UserWipesData(UserID):
+    mycursor.execute("SELECT wipes FROM users WHERE id = %s", (UserID,))
+    response = mycursor.fetchone()[0]
+    return response
+
 def DashData():
     #note to self: add data caching so data isnt grabbed every time the dash is accessed
     """Grabs all the values for the dashboard."""
@@ -1039,21 +1044,53 @@ def DeleteUserComments(AccId):
     mycursor.execute("DELETE FROM user_comments WHERE op = %s", (AccId,))
     mydb.commit()
 
-def WipeAccount(AccId):
+def WipeAccount(form, session, AccId):
+    ModesToWipe = form.get("modes_to_wipe")
+    WipeReason = form.get("wipe_reason")
+    AccountId = (AccId)
+    ModId = session["AccountId"]
+
     """Wipes the account with the given id."""
     r.publish("peppy:disconnect", json.dumps({ #lets the user know what is up
         "userID" : AccId,
         "reason" : "Your account has been wiped! F"
     }))
-    if UserConfig["HasRelax"]:
-        mycursor.execute("DELETE FROM scores_relax WHERE userid = %s", (AccId,))
-    if UserConfig["HasAutopilot"]:
-        mycursor.execute("DELETE FROM scores_ap WHERE userid = %s", (AccId,))
-    WipeVanilla(AccId)
-    if UserConfig["HasRelax"]:
+
+    # if UserConfig["HasRelax"]:
+    #     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 1", (AccId,))
+    # if UserConfig["HasAutopilot"]:
+    #     mycursor.execute("DELETE FROM scores_ap WHERE userid = %s", (AccId,))
+    # WipeVanilla(AccId)
+    # if UserConfig["HasRelax"]:
+    #     WipeRelax(AccId)
+    # if UserConfig["HasAutopilot"]:
+    #     WipeAutopilot(AccId)
+
+    # Wipe selected mode
+    if ModesToWipe == "all":
+        WipeVanilla(AccId)
         WipeRelax(AccId)
-    if UserConfig["HasAutopilot"]:
-        WipeAutopilot(AccId)
+    if ModesToWipe == "rx":
+        WipeRelax(AccId)
+    if ModesToWipe == "vn":
+        WipeVanilla(AccId)
+
+    # Wipe logging
+    Timestamp = round(time.time())
+    mycursor.execute("INSERT INTO users_wipes (userid, modid, datetime, reason) VALUES (%s, %s, %s, %s)", (AccountId, ModId, Timestamp, WipeReason,))
+    mydb.commit()
+
+    # Wipe counting
+    mycursor.execute("SELECT wipes FROM users WHERE id = %s", (AccountId,))
+    currentWipes = mycursor.fetchone()[0]
+    newWipes = (currentWipes + 1)
+
+    if currentWipes >= 3:
+        print("user has been restricted")
+        # Reset wipes count, since user is restricted
+        mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (0, AccountId,))
+    else:
+        mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (newWipes, AccountId,))
 
 def WipeVanilla(AccId):
     """Wiped vanilla scores for user."""

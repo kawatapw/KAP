@@ -209,18 +209,7 @@
             <a href="/actions/hwid/{{ UserData['Id'] }}" class="btn btn-danger" id="hwid">Clear HWID</a>
             <a href="/action/confirm/delete/{{ UserData['Id'] }}" class="btn btn-danger", id="delete">Delete Account</a>
             <a href="/actions/kick/{{ UserData['Id'] }}" class="btn btn-warning" id="kick">Kick User</a>
-            {% if config["HasRelax"] or config["HasAutopilot"] %}
-            <a href="/actions/wipe/{{ UserData['Id'] }}" class="btn btn-danger" id="wipe">Full Wipe</a>
-            <a href="/actions/wipeva/{{ UserData['Id'] }}" class="btn btn-danger" id="wipe">Wipe Vanilla</a>
-            {% else %}
-            <a href="/actions/wipe/{{ UserData['Id'] }}" class="btn btn-danger" id="wipe">Wipe</a>
-            {% endif %}
-            {% if config["HasRelax"] %}
-            <a href="/actions/wiperx/{{ UserData['Id'] }}" class="btn btn-danger" id="wipe">Wipe Relax</a>
-            {% endif %}
-            {% if config["HasAutopilot"] %}
-            <a href="/actions/wipeap/{{ UserData['Id'] }}" class="btn btn-danger" id="wipe">Wipe Autopilot</a>
-            {% endif %}
+            <a href="/user/wipe/{{ UserData['Id'] }}" class="btn btn-danger" id="wipe">Wipe User</a>
         </div>
     </div>
     <div class="card-footer">
