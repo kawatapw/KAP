@@ -1892,15 +1892,16 @@ def SetBMAPSetStatus(BeatmapSet: int, Staus: int, session):
     MapData = all_maps[0]
     #Getting bmap name without diff
     BmapName = MapData[0].split("[")[0].rstrip() #¯\_(ツ)_/¯ might work
-    #webhook, didnt use webhook function as it was too adapted for single map webhook
-    webhook = DiscordWebhook(url=UserConfig["Webhook"])
-    embed = DiscordEmbed(description=f"Ranked by {session['AccountName']}", color=242424)
-    embed.set_author(name=f"{BmapName} was just {TitleText}.", url=f"https://ussr.pl/b/{MapData[1]}", icon_url=f"https://a.ussr.pl/{session['AccountId']}") #will rank to random diff but yea
-    embed.set_footer(text="via RealistikPanel!")
-    embed.set_image(url=f"https://assets.ppy.sh/beatmaps/{BeatmapSet}/covers/cover.jpg")
-    webhook.add_embed(embed)
-    print(" * Posting webhook!")
-    webhook.execute()
+    if UserConfig["Webhook"] != "":
+        #webhook, didnt use webhook function as it was too adapted for single map webhook
+        webhook = DiscordWebhook(url=UserConfig["Webhook"])
+        embed = DiscordEmbed(description=f"Ranked by {session['AccountName']}", color=242424)
+        embed.set_author(name=f"{BmapName} was just {TitleText}.", url=f"https://ussr.pl/b/{MapData[1]}", icon_url=f"https://a.ussr.pl/{session['AccountId']}") #will rank to random diff but yea
+        embed.set_footer(text="via RealistikPanel!")
+        embed.set_image(url=f"https://assets.ppy.sh/beatmaps/{BeatmapSet}/covers/cover.jpg")
+        webhook.add_embed(embed)
+        print(" * Posting webhook!")
+        webhook.execute()
 
     # Refresh all lbs.
     for _, _, md5 in all_maps: refresh_bmap(md5)
