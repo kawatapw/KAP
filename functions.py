@@ -954,10 +954,6 @@ def ApplyUserEdit(form, session):
     #SQL Queries
     mycursor.execute("UPDATE users SET email = %s, notes = %s, username = %s, username_safe = %s, privileges=%s, bypass_hwid=%s WHERE id = %s", (Email, Notes, Username, SafeUsername, Privilege, HWIDBypass, UserId,))
     mycursor.execute("UPDATE users_stats SET country = %s, userpage_content = %s, username_aka = %s, username = %s WHERE id = %s", (Country, UserPage, Aka, Username, UserId,))
-    if UserConfig["HasRelax"]:
-        mycursor.execute("UPDATE rx_stats SET country = %s, username_aka = %s, username = %s WHERE id = %s", (Country, Aka, Username, UserId,))
-    if UserConfig["HasAutopilot"]:
-        mycursor.execute("UPDATE ap_stats SET country = %s, username_aka = %s, username = %s WHERE id = %s", (Country, Aka, Username, UserId,))
     mydb.commit()
 
     # Refresh in pep.py - Rosu only
