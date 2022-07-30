@@ -1096,8 +1096,10 @@ def WipeAccount(form, session, AccId):
         print("user has been restricted")
         # Reset wipes count, since user is restricted
         mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (0, AccountId,))
+        mydb.commit()
     else:
         mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (newWipes, AccountId,))
+        mydb.commit()
 
 def WipeVanilla(AccId):
     """Wiped vanilla scores for user."""
