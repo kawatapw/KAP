@@ -895,7 +895,7 @@ def RAPFetch(page = 1):
 
 def WipeLogsFetch(id):
     """Fetches Wipe Logs."""
-    mycursor.execute("SELECT * FROM users_wipes WHERE userid = %s ORDER BY id DESC", (id,))
+    mycursor.execute("SELECT * FROM users_wipes WHERE userid = %s ORDER BY id DESC LIMIT 10", (id,))
     Data = mycursor.fetchall()
 
     #log structure
@@ -1125,14 +1125,34 @@ def WipeAccount(form, session, AccId):
     currentWipes = mycursor.fetchone()[0]
     newWipes = (currentWipes + 1)
 
+    # Check if user is currently restricted
+    mycursor.execute("SELECT privileges FROM users WHERE id = %s", (AccountId,))
+    Privilege = mycursor.fetchall()
+    
+    if len(Privilege) == 0: 
+        return
+    Privilege = Privilege[0][0]
+    if not Privilege & 1: # restricted
+        isRestricted = 1
+    else: # unrestricted
+        isRestricted = 0
+
     if currentWipes >= 3:
-        print("user has been restricted")
-        # Reset wipes count, since user is restricted
-        mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (0, AccountId,))
-        mydb.commit()
+        if isRestricted == 1:
+            # do nothing, as the user is already restricted
+            print("doing nothing")
+            pass
+        if isRestricted == 0:
+            # Restrict user
+            ResUnTrict(AccountId, "Automatically restricted due to wipes", "Automatically restricted due to wipes")
+            # Reset wipes count, since user is restricted
+            mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (0, AccountId,))
+            mydb.commit()
     else:
-        mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (newWipes, AccountId,))
-        mydb.commit()
+        if isRestricted == 0:
+            mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (newWipes, AccountId,))
+            mydb.commit()
+        # Freeze wipe count if user is already restricted
 
 def WipeVanilla(AccId):
     """Wiped vanilla scores for user."""
