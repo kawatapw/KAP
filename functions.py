@@ -254,11 +254,11 @@ def RecentPlays(TotalPlays = 20, MinPP = 0):
     if UserConfig["HasRelax"]: DivBy += 1
     if UserConfig["HasAutopilot"]: DivBy += 1
     PerGamemode = round(TotalPlays/DivBy)
-    mycursor.execute("SELECT scores.beatmap_md5, users.username, scores.userid, scores.time, scores.score, scores.pp, scores.play_mode, scores.mods, scores.300_count, scores.100_count, scores.50_count, scores.misses_count FROM scores LEFT JOIN users ON users.id = scores.userid WHERE users.privileges & 1 AND scores.pp >= %s ORDER BY scores.id DESC LIMIT %s", (MinPP, PerGamemode,))
+    mycursor.execute("SELECT scores.beatmap_md5, users.username, scores.userid, scores.time, scores.score, scores.pp, scores.play_mode, scores.mods, scores.300_count, scores.100_count, scores.50_count, scores.misses_count FROM scores LEFT JOIN users ON users.id = scores.userid WHERE users.privileges & 1 AND scores.pp >= %s AND scores.is_relax = 0 ORDER BY scores.id DESC LIMIT %s", (MinPP, PerGamemode,))
     plays = mycursor.fetchall()
     if UserConfig["HasRelax"]:
         #adding relax plays
-        mycursor.execute("SELECT scores_relax.beatmap_md5, users.username, scores_relax.userid, scores_relax.time, scores_relax.score, scores_relax.pp, scores_relax.play_mode, scores_relax.mods, scores_relax.300_count, scores_relax.100_count, scores_relax.50_count, scores_relax.misses_count FROM scores_relax LEFT JOIN users ON users.id = scores_relax.userid WHERE users.privileges & 1 AND scores_relax.pp >= %s ORDER BY scores_relax.id DESC LIMIT %s", (MinPP, PerGamemode,))
+        mycursor.execute("SELECT scores.beatmap_md5, users.username, scores.userid, scores.time, scores.score, scores.pp, scores.play_mode, scores.mods, scores.300_count, scores.100_count, scores.50_count, scores.misses_count FROM scores LEFT JOIN users ON users.id = scores.userid WHERE users.privileges & 1 AND scores.pp >= %s AND scores.is_relax = 1 ORDER BY scores.id DESC LIMIT %s", (MinPP, PerGamemode,))
         playx_rx = mycursor.fetchall()
         for plays_rx in playx_rx:
             #addint them to the list
@@ -1362,8 +1362,7 @@ def DeleteAccount(id : int):
     mycursor.execute("DELETE FROM user_clans WHERE user = %s", (id,))
     mycursor.execute("DELETE FROM users_stats WHERE id = %s", (id,))
     if UserConfig["HasRelax"]:
-        mycursor.execute("DELETE FROM scores_relax WHERE userid = %s", (id,))
-        mycursor.execute("DELETE FROM rx_stats WHERE id = %s", (id,))
+        mycursor.execute("DELETE FROM users_stats_relax WHERE id = %s", (id,))
     if UserConfig["HasAutopilot"]:
         mycursor.execute("DELETE FROM scores_ap WHERE userid = %s", (id,))
         mycursor.execute("DELETE FROM ap_stats WHERE id = %s", (id,))
@@ -2321,7 +2320,7 @@ def calc_first_place(beatmap_md5: str, rx: int = 0, mode: int = 0) -> None:
     # We have to work out table.
     table = {
         0: "scores",
-        1: "scores_relax",
+        1: "scores",
         2: "scores_ap"
     }.get(rx)
 
