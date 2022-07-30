@@ -930,10 +930,10 @@ def ApplyUserEdit(form, session):
     Notes = form.get("notes", False)
     Privilege = form.get("privilege", False)
     HWIDBypass = form.get("hwid_bypass", False) == "1"
-    Wipes = form.get("wipes", False)
+    Wipes = int(form.get("wipes", False))
 
     # Check if wipes count value is valid
-    valueValid = 0 <= int(Wipes) <= 3
+    valueValid = 0 <= Wipes <= 3
     if valueValid == False:
         raise NameError
 
@@ -964,7 +964,7 @@ def ApplyUserEdit(form, session):
     BadgeList = [int(form.get("Badge1", 0)), int(form.get("Badge2", 0)), int(form.get("Badge3", 0)), int(form.get("Badge4", 0)), int(form.get("Badge5", 0)), int(form.get("Badge6", 0))]
     SetUserBadges(UserId, BadgeList)
     #SQL Queries
-    mycursor.execute("UPDATE users SET email = %s, notes = %s, username = %s, username_safe = %s, privileges=%s, bypass_hwid=%s WHERE id = %s", (Email, Notes, Username, SafeUsername, Privilege, HWIDBypass, UserId,))
+    mycursor.execute("UPDATE users SET email = %s, notes = %s, username = %s, username_safe = %s, privileges=%s, bypass_hwid=%s, wipes=%s WHERE id = %s", (Email, Notes, Username, SafeUsername, Privilege, HWIDBypass, Wipes, UserId,))
     mycursor.execute("UPDATE users_stats SET country = %s, userpage_content = %s, username_aka = %s, username = %s WHERE id = %s", (Country, UserPage, Aka, Username, UserId,))
     mydb.commit()
 
