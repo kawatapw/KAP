@@ -1259,18 +1259,20 @@ def ResUnTrict(id : int, note: str = None, reason: str = None):
         if note:
             mycursor.execute("UPDATE users SET notes = CONCAT(notes, %s) WHERE id = %s LIMIT 1", ("\n" + note, id))
 
-        # First places KILL.
-        mycursor.execute(
-            "SELECT beatmap_md5 FROM first_places WHERE user_id = %s",
-            (id,)
-        )
-        recalc_maps = mycursor.fetchall()
+        # # First places KILL.
+        # mycursor.execute(
+        #     "SELECT beatmap_md5 FROM first_places WHERE user_id = %s",
+        #     (id,)
+        # )
+        # recalc_maps = mycursor.fetchall()
 
-        # Delete all of their old.
-        mycursor.execute("DELETE FROM first_places WHERE user_id = %s", 
-            (id,)
-        )
-        for bmap_md5, in recalc_maps: calc_first_place(bmap_md5)
+        # # Delete all of their old.
+        # mycursor.execute("DELETE FROM first_places WHERE user_id = %s", 
+        #     (id,)
+        # )
+        
+        # for bmap_md5, in recalc_maps: calc_first_place(bmap_md5)
+        
     UpdateBanStatus(id)
     mydb.commit()
     return TheReturn
