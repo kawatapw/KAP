@@ -8,7 +8,7 @@ import datetime
 import requests
 from discord_webhook import DiscordWebhook, DiscordEmbed
 import time
-import hashlib 
+import hashlib
 import json
 import pycountry
 from osrparse import *
@@ -48,7 +48,7 @@ def ConsoleLog(Info: str, Additional: str="", Type: int=1):
         #if doesnt exist
         with open("realistikpanel.log", "w+") as json_file:
             json.dump([], json_file, indent=4)
-    
+
     #gets current log
     with open("realistikpanel.log", "r") as Log:
         Log = json.load(Log)
@@ -72,7 +72,7 @@ def ConsoleLog(Info: str, Additional: str="", Type: int=1):
         Colour = "15417396"
         TypeText = "error"
         Icon = "https://freeiconshop.com/wp-content/uploads/edd/error-flat.png"
-    
+
     #I promise to redo this, this is just proof of concept
     if UserConfig["ConsoleLogWebhook"] != "":
         webhook = DiscordWebhook(url=UserConfig["ConsoleLogWebhook"])
@@ -207,7 +207,7 @@ def LoginHandler(username, password):
         IsBanned = User[2]
         Privilege = User[3]
         UserID = User[4]
-        
+
         #dont  allow the bot account to log in (in case the server has a MASSIVE loophole)
         if UserID == 999:
             return [False, "You may not log into the bot account."]
@@ -226,7 +226,7 @@ def LoginHandler(username, password):
                         "exp" : datetime.datetime.utcnow() + datetime.timedelta(hours=2) #so the token expires
                     }]
                 else:
-                     return False, "The password you have entered is incorrect!"
+                    return False, "The password you have entered is incorrect!"
             else:
                 return False, "The account you are attempting to log into is missing the appropriate privileges to carry out this action!"
 
@@ -238,9 +238,9 @@ def TimestampConverter(timestamp, NoDate=1):
     #hour = str(date.hour)
     #minute = str(date.minute)
     #if len(hour) == 1:
-        #hour = "0" + hour
+    #hour = "0" + hour
     #if len(minute) == 1:
-        #minute = "0" + minute
+    #minute = "0" + minute
     if NoDate == 1:
         #return f"{hour}:{minute}"
         return date.strftime("%H:%M")
@@ -301,7 +301,7 @@ def RecentPlays(TotalPlays = 20, MinPP = 0):
         Dicti["Time"] = TimestampConverter(x[3])
         Dicti["Accuracy"] = round(GetAccuracy(x[8], x[9], x[10], x[11]), 2)
         ReadableArray.append(Dicti)
-    
+
     ReadableArray = sorted(ReadableArray, key=lambda k: k["Timestamp"]) #sorting by time
     ReadableArray.reverse()
     return ReadableArray
@@ -351,7 +351,7 @@ def BSPostHandler(post, session):
         mycursor.execute("UPDATE bancho_settings SET value_int = 1 WHERE name = 'bancho_maintenance'")
     else:
         mycursor.execute("UPDATE bancho_settings SET value_int = 0 WHERE name = 'bancho_maintenance'")
-    
+
     mydb.commit()
     RAPLog(session["AccountId"], "modified the bancho settings")
 
@@ -379,7 +379,7 @@ def GetBmapInfo(id):
         BMS_Data = mycursor.fetchall()
     BeatmapList = []
     for beatmap in BMS_Data:
-        thing = { 
+        thing = {
             "SongName" : beatmap[0],
             "Ar" : str(beatmap[1]),
             "Difficulty" : str(round(beatmap[2], 2)),
@@ -493,12 +493,12 @@ def HasPrivilege(UserID : int, ReqPriv = 2):
         result = Privilege & RPManageClans
     elif ReqPriv == 16:
         result = Privilege & RPViewIPs
-    
+
     if result >= 1:
         return True
     else:
         return False
-    
+
 
 def RankBeatmap(BeatmapNumber, BeatmapId, ActionName, session):
     """Ranks a beatmap"""
@@ -635,7 +635,7 @@ def ApplySystemSettings(DataArray, Session):
         Register = 1
     else:
         Register = 0
-    
+
     #SQL Queries
     mycursor.execute("UPDATE system_settings SET value_int = %s WHERE name = 'website_maintenance'", (WebMan,))
     mycursor.execute("UPDATE system_settings SET value_int = %s WHERE name = 'game_maintenance'", (GameMan,))
@@ -650,7 +650,7 @@ def ApplySystemSettings(DataArray, Session):
         mycursor.execute("UPDATE system_settings SET value_int = 1, value_string = %s WHERE name = 'website_home_alert'", (HomeAlert,))
     else:
         mycursor.execute("UPDATE system_settings SET value_int = 0, value_string = '' WHERE name = 'website_home_alert'")
-    
+
     mydb.commit() #applies the changes
 
 def IsOnline(AccountId: int) -> bool:
@@ -753,7 +753,7 @@ def FetchUsers(page = 0):
         else:
             Dict["Allowed"] = False
         Users.append(Dict)
-    
+
     return Users
 
 def GetUser(id):
@@ -806,7 +806,7 @@ def UserData(UserID):
         Freeze = mycursor.fetchone()
     except:
         Freeze = False
-  
+
     Data["UserpageContent"] = Data1[0]
     Data["UserColour"] = Data1[1]
     Data["Aka"] = Data1[2]
@@ -829,14 +829,14 @@ def UserData(UserID):
     Data["DonorExpireStr"] = TimeToTimeAgo(Data["DonorExpire"])
 
     #now for silences and ban times
-    Data["IsBanned"] = CoolerInt(Data2[7]) > 0                       
+    Data["IsBanned"] = CoolerInt(Data2[7]) > 0
     Data["BanedAgo"] = TimeToTimeAgo(CoolerInt(Data2[7]))
     Data["IsSilenced"] =  CoolerInt(Data2[5]) > round(time.time())
     Data["SilenceEndAgo"] = TimeToTimeAgo(CoolerInt(Data2[5]))
     if Freeze:
         Data["IsFrozen"] = int(Freeze[0]) > 0
         Data["FreezeDateNo"] = int(Freeze[0])
-        Data["FreezeDate"] = TimeToTimeAgo(Data["FreezeDateNo"])  
+        Data["FreezeDate"] = TimeToTimeAgo(Data["FreezeDateNo"])
     else:
         Data["IsFrozen"] = False
 
@@ -867,7 +867,7 @@ def RAPFetch(page = 1):
     for user in UniqueUsers:
         UserData = GetUser(user)
         UserDict[str(user)] = UserData
-    
+
     #log structure
     #[
     #    {
@@ -966,8 +966,7 @@ def ApplyUserEdit(form, session):
     Wipes = int(form.get("wipes", False))
 
     # Check if wipes count value is valid
-    valueValid = 0 <= Wipes <= 3
-    if valueValid == False:
+    if 0 <= Wipes <= 3:
         raise NameError
 
     if not UserId or not Username:
@@ -1123,13 +1122,12 @@ def WipeAccount(form, session, AccId):
     # Wipe counting
     mycursor.execute("SELECT wipes FROM users WHERE id = %s", (AccountId,))
     currentWipes = mycursor.fetchone()[0]
-    newWipes = (currentWipes + 1)
 
     # Check if user is currently restricted
     mycursor.execute("SELECT privileges FROM users WHERE id = %s", (AccountId,))
     Privilege = mycursor.fetchall()
-    
-    if len(Privilege) == 0: 
+
+    if len(Privilege) == 0:
         return
     Privilege = Privilege[0][0]
     if not Privilege & 1: # restricted
@@ -1138,19 +1136,15 @@ def WipeAccount(form, session, AccId):
         isRestricted = 0
 
     if currentWipes >= 3:
-        if isRestricted == 1:
-            # do nothing, as the user is already restricted
-            print("doing nothing")
-            pass
-        if isRestricted == 0:
+        if isRestricted:
             # Restrict user
             ResUnTrict(AccountId, "Automatically restricted due to wipes", "Automatically restricted due to wipes")
             # Reset wipes count, since user is restricted
-            mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (0, AccountId,))
+            mycursor.execute("UPDATE users SET wipes = 0 WHERE id = %s", (AccountId,))
             mydb.commit()
     else:
-        if isRestricted == 0:
-            mycursor.execute("UPDATE users SET wipes = %s WHERE id = %s", (newWipes, AccountId,))
+        if isRestricted:
+            mycursor.execute("UPDATE users SET wipes = wipes + 1 WHERE id = %s", (AccountId,))
             mydb.commit()
         # Freeze wipe count if user is already restricted
 
@@ -1332,7 +1326,7 @@ def ResUnTrict(id : int, note: str = None, reason: str = None):
         # mycursor.execute("DELETE FROM first_places WHERE user_id = %s", 
         #     (id,)
         # )
-        
+
         # for bmap_md5, in recalc_maps: calc_first_place(bmap_md5)
 
     UpdateBanStatus(id)
@@ -1354,7 +1348,7 @@ def FreezeHandler(id : int):
         TheReturn = False
     else:
         if UserConfig["TimestampType"] == "ainu":
-        # example: 20200716 instead of 478923793298473298432789437289472394379847329847328943829489432789473289
+            # example: 20200716 instead of 478923793298473298432789437289472394379847329847328943829489432789473289
             freezedateunix = int(datetime.datetime.utcfromtimestamp(int(time.time()) + 432000).strftime("%Y%m%d"))
         else:
             freezedate = datetime.datetime.now() + datetime.timedelta(days=5)
@@ -1366,12 +1360,12 @@ def FreezeHandler(id : int):
         FokaMessage(params)
     mydb.commit()
     return TheReturn
-   
+
 def BanUser(id : int, reason: str = None):
     """User go bye bye!"""
     if reason:
         mycursor.execute("UPDATE users SET ban_reason = %s WHERE id = %s", (reason, id,))
-    
+
     mycursor.execute("SELECT privileges FROM users WHERE id = %s", (id,))
     Privilege = mycursor.fetchall()
     Timestamp = round(time.time())
@@ -1414,7 +1408,7 @@ def DeleteAccount(id : int):
     mycursor.execute("DELETE FROM comments WHERE user_id = %s", (id,))
     mycursor.execute("DELETE FROM discord_roles WHERE userid = %s", (id,))
     mycursor.execute("DELETE FROM ip_user WHERE userid = %s", (id,))
-    mycursor.execute("DELETE FROM profile_backgrounds WHERE uid = %s", (id,)) 
+    mycursor.execute("DELETE FROM profile_backgrounds WHERE uid = %s", (id,))
     mycursor.execute("DELETE FROM rank_requests WHERE userid = %s", (id,))
     mycursor.execute("DELETE FROM reports WHERE to_uid = %s OR from_uid = %s", (id, id,))
     mycursor.execute("DELETE FROM tokens WHERE user = %s", (id,))
@@ -1493,7 +1487,7 @@ def PlayStyle(Enum : int):
         Styles.append("Dick")
     if Enum & Eggplant >= 1:
         Styles.append("Eggplant")
-    
+
     return Styles
 
 def PlayerCountCollection(loop = True):
@@ -1513,7 +1507,7 @@ def DashActData():
     """Returns data for dash graphs."""
     Data = {}
     Data["PlayerCount"] = json.dumps(PlayerCount) #string for easier use in js
-    
+
     #getting time intervals
     PrevNum = 0
     IntervalList = []
@@ -1751,11 +1745,11 @@ def CheckExists():
 def UpdateUserStore(Username: str):
     """Updates the user info stored in rpusers.json or creates the file."""
     CheckExists()
-    
+
     #gets current log
     with open("rpusers.json", "r") as Log:
         Store = json.load(Log)
-    
+
     Store[Username] = {
         "Username" : Username,
         "LastLogin" : round(time.time()),
@@ -1775,10 +1769,10 @@ def UpdateUserStore(Username: str):
 def GetUserStore(Username: str):
     """Gets user info from the store."""
     CheckExists()
-    
+
     with open("rpusers.json", "r") as Log:
         Store = json.load(Log)
-    
+
     if Username in list(Store.keys()):
         return Store[Username]
     else:
@@ -1801,7 +1795,7 @@ def GetStore():
     CheckExists()
     with open("rpusers.json", "r") as RPUsers:
         Store = json.load(RPUsers)
-    
+
     TheList = []
     for x in list(Store.keys()):
         #timeago - bit of an afterthought so sorry for weird implementation
@@ -1886,7 +1880,7 @@ def SetBMAPSetStatus(BeatmapSet: int, Staus: int, session):
         TitleText = "ranked"
     elif Staus == 5:
         TitleText = "loved"
-    
+
     mycursor.execute("SELECT song_name, beatmap_id, beatmap_md5 FROM beatmaps WHERE beatmapset_id = %s", (BeatmapSet,))
     all_maps = mycursor.fetchall()
     MapData = all_maps[0]
@@ -1896,7 +1890,7 @@ def SetBMAPSetStatus(BeatmapSet: int, Staus: int, session):
         #webhook, didnt use webhook function as it was too adapted for single map webhook
         webhook = DiscordWebhook(url=UserConfig["Webhook"])
         embed = DiscordEmbed(description=f"Ranked by {session['AccountName']}", color=242424)
-        embed.set_author(name=f"{BmapName} was just {TitleText}.", url=f"https://ussr.pl/b/{MapData[1]}", icon_url=f"https://a.ussr.pl/{session['AccountId']}") #will rank to random diff but yea
+        embed.set_author(name=f"{BmapName} was just {TitleText}.", url=f"https://kawata.pw/b/{MapData[1]}", icon_url=f"https://a.kawata.pw/{session['AccountId']}") #will rank to random diff but yea
         embed.set_footer(text="via RealistikPanel!")
         embed.set_image(url=f"https://assets.ppy.sh/beatmaps/{BeatmapSet}/covers/cover.jpg")
         webhook.add_embed(embed)
@@ -1960,7 +1954,7 @@ def FindUserByUsername(User: str, Page):
             else:
                 Dict["Allowed"] = False
             TheUsersDict.append(Dict)
-        
+
         return TheUsersDict
     else:
         return []
@@ -2184,7 +2178,7 @@ def GetClanMembers(ClanID: int):
         Conditions += f"id = %s OR "
         args.append(ClanUser[0])
     Conditions = Conditions[:-4] #remove the OR
-    
+
     #getting the users
     mycursor.execute(f"SELECT username, id, register_datetime FROM users WHERE {Conditions}", args) #here i use format as the conditions are a trusted input
     UserData = mycursor.fetchall()
@@ -2252,11 +2246,11 @@ def NukeClan(ClanID: int, session):
     Clan = GetClan(ClanID)
     if not Clan:
         return
-    
+
     # Make all tags refresh.
     mycursor.execute("SELECT user FROM user_clans WHERE clan=%s", (ClanID,))
     c_m_db = mycursor.fetchall()
-    
+
     mycursor.execute("DELETE FROM clans WHERE id = %s LIMIT 1", (ClanID,))
     mycursor.execute("DELETE FROM user_clans WHERE clan=%s", (ClanID,))
     # run this after
@@ -2454,7 +2448,7 @@ def refresh_username_cache(user_id: int, new_name: str) -> None:
         "userID": user_id,
         "newUsername": new_name
     }))
-    
+
 class BanLog(TypedDict):
     from_id: int
     from_name: str
@@ -2475,9 +2469,9 @@ PAGE_SIZE = 50
 
 def fetch_banlogs(page: int = 0) -> list[BanLog]:
     """Fetches a page of ban logs."""
-    
+
     mycursor.execute(BAN_LOG_BASE + f"ORDER BY b.id DESC LIMIT {PAGE_SIZE} OFFSET {PAGE_SIZE * page}")
-    
+
     # Convert into dicts.
     return [{
         "from_id": row[0],
@@ -2492,12 +2486,12 @@ def fetch_banlogs(page: int = 0) -> list[BanLog]:
 
 def ban_count() -> int:
     """Returns the total number of bans."""
-    
+
     mycursor.execute("SELECT COUNT(*) FROM ban_logs")
     return mycursor.fetchone()[0]
 
 def ban_pages() -> int:
     """Returns the number of pages in the ban log."""
-    
+
     return math.ceil(ban_count() / PAGE_SIZE)
 
