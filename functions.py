@@ -966,7 +966,7 @@ def ApplyUserEdit(form, session):
     Wipes = int(form.get("wipes", False))
 
     # Check if wipes count value is valid
-    if 0 <= Wipes <= 3:
+    if not 0 <= Wipes <= 3:
         raise NameError
 
     if not UserId or not Username:
