@@ -1131,19 +1131,19 @@ def WipeAccount(form, session, AccId):
         return
     Privilege = Privilege[0][0]
     if not Privilege & 1: # restricted
-        isRestricted = 1
+        isRestricted = True
     else: # unrestricted
-        isRestricted = 0
+        isRestricted = False
 
     if currentWipes >= 3:
-        if isRestricted:
+        if not isRestricted:
             # Restrict user
             ResUnTrict(AccountId, "Automatically restricted due to wipes", "Automatically restricted due to wipes")
             # Reset wipes count, since user is restricted
             mycursor.execute("UPDATE users SET wipes = 0 WHERE id = %s", (AccountId,))
             mydb.commit()
     else:
-        if isRestricted:
+        if not isRestricted:
             mycursor.execute("UPDATE users SET wipes = wipes + 1 WHERE id = %s", (AccountId,))
             mydb.commit()
         # Freeze wipe count if user is already restricted
