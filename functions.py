@@ -991,8 +991,10 @@ def ApplyUserEdit(form, session):
         if int(Privilege) > OriginalPriv:
             return
 
-    #Badges
+    mycursor.execute("SELECT username FROM users WHERE id = %s", (UserId,))
+    OriginalUsername = mycursor.fetchone()[0]
 
+    #Badges
     BadgeList = [int(form.get("Badge1", 0)), int(form.get("Badge2", 0)), int(form.get("Badge3", 0)), int(form.get("Badge4", 0)), int(form.get("Badge5", 0)), int(form.get("Badge6", 0))]
     SetUserBadges(UserId, BadgeList)
     #SQL Queries
@@ -1004,7 +1006,12 @@ def ApplyUserEdit(form, session):
     r.publish("peppy:refresh_privs", json.dumps({
         "user_id": UserId
     }))
-    refresh_username_cache(UserId, Username)
+
+    # Only refresh username cache when username has changed, as changing to the same username causes an error.
+    if Username != OriginalUsername:
+        refresh_username_cache(UserId, Username)
+    else:
+        return
 
 def ModToText(mod: int):
     """Converts mod enum to cool string."""
