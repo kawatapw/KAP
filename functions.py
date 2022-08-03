@@ -1010,8 +1010,6 @@ def ApplyUserEdit(form, session):
     # Only refresh username cache when username has changed, as changing to the same username causes an error.
     if Username != OriginalUsername:
         refresh_username_cache(UserId, Username)
-    else:
-        return
 
 def ModToText(mod: int):
     """Converts mod enum to cool string."""
