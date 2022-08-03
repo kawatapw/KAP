@@ -1197,8 +1197,7 @@ def WipeVanilla(AccId):
     mydb.commit()
 
     """Removes the user from leaderboards."""
-    Modes = ["std", "ctb", "mania", "taiko"]
-    for mode in Modes:
+    for mode in ("std", "ctb", "mania", "taiko"):
         #redis for each mode
         r.zrem(f"ripple:leaderboard:{mode}", AccId)
         
@@ -1252,8 +1251,7 @@ def WipeRelax(AccId):
     mydb.commit()
 
     """Removes the user from leaderboards."""
-    Modes = ["std", "ctb", "mania", "taiko"]
-    for mode in Modes:
+    for mode in ("std", "ctb", "mania", "taiko"):
         #redis for each mode
         r.zrem(f"ripple:leaderboard_relax:{mode}", AccId)
         
