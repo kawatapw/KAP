@@ -991,8 +991,10 @@ def ApplyUserEdit(form, session):
         if int(Privilege) > OriginalPriv:
             return
 
-    #Badges
+    mycursor.execute("SELECT username FROM users WHERE id = %s", (UserId,))
+    OriginalUsername = mycursor.fetchone()[0]
 
+    #Badges
     BadgeList = [int(form.get("Badge1", 0)), int(form.get("Badge2", 0)), int(form.get("Badge3", 0)), int(form.get("Badge4", 0)), int(form.get("Badge5", 0)), int(form.get("Badge6", 0))]
     SetUserBadges(UserId, BadgeList)
     #SQL Queries
@@ -1004,7 +1006,10 @@ def ApplyUserEdit(form, session):
     r.publish("peppy:refresh_privs", json.dumps({
         "user_id": UserId
     }))
-    refresh_username_cache(UserId, Username)
+
+    # Only refresh username cache when username has changed, as changing to the same username causes an error.
+    if Username != OriginalUsername:
+        refresh_username_cache(UserId, Username)
 
 def ModToText(mod: int):
     """Converts mod enum to cool string."""
@@ -1208,6 +1213,16 @@ def WipeVanilla(AccId):
     mycursor.execute("DELETE FROM users_beatmap_playcount WHERE user_id = %s", (AccId,))
     mydb.commit()
 
+    """Removes the user from leaderboards."""
+    for mode in ("std", "ctb", "mania", "taiko"):
+        #redis for each mode
+        r.zrem(f"ripple:leaderboard:{mode}", AccId)
+        
+        mycursor.execute("SELECT country FROM users_stats WHERE id = %s LIMIT 1", (AccId,))
+        Country = mycursor.fetchone()[0]
+        if Country != "XX": #check if the country is not set
+            r.zrem(f"ripple:leaderboard:{mode}:{Country}", AccId)
+
 def WipeRelax(AccId):
     """Wipes the relax user data."""
     mycursor.execute("""UPDATE
@@ -1251,6 +1266,16 @@ def WipeRelax(AccId):
     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 1", (AccId,))
     mycursor.execute("DELETE FROM users_beatmap_playcount WHERE user_id = %s", (AccId,))
     mydb.commit()
+
+    """Removes the user from leaderboards."""
+    for mode in ("std", "ctb", "mania", "taiko"):
+        #redis for each mode
+        r.zrem(f"ripple:leaderboard_relax:{mode}", AccId)
+        
+        mycursor.execute("SELECT country FROM users_stats WHERE id = %s LIMIT 1", (AccId,))
+        Country = mycursor.fetchone()[0]
+        if Country != "XX": #check if the country is not set
+            r.zrem(f"ripple:leaderboard_relax:{mode}:{Country}", AccId)
 
 def WipeAutopilot(AccId):
     """Wipes the autopilot user data."""
