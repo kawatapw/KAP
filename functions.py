@@ -1107,11 +1107,23 @@ def WipeAccount(form, session, AccId):
 
     # Wipe selected mode
     if ModesToWipe == "all":
+        r.publish("ussr:wipe", json.dumps({ # tells ussr to remove user from lbs
+            "userID" : AccId,
+            "isRelax" : 2
+        }))
         WipeVanilla(AccId)
         WipeRelax(AccId)
     if ModesToWipe == "rx":
+        r.publish("ussr:wipe", json.dumps({ # tells ussr to remove user from lbs
+            "userID" : AccId,
+            "isRelax" : 1
+        }))
         WipeRelax(AccId)
     if ModesToWipe == "vn":
+        r.publish("ussr:wipe", json.dumps({ # tells ussr to remove user from lbs
+            "userID" : AccId,
+            "isRelax" : 0
+        }))
         WipeVanilla(AccId)
 
     # Wipe logging
