@@ -519,9 +519,9 @@ def Restrict(id: int):
     if HasPrivilege(session["AccountId"], 6):
         Account = GetUser(id)
         if ResUnTrict(id, request.args.get("note"), request.args.get("reason")):
-            RAPLog(session["AccountId"], f"has restricted the account {Account['Username']} ({id})")
+            RAPLog(session["AccountId"], f"has restricted the account {Account['Username']} ({id}). Reason: {request.args.get('reason')}")
         else:
-            RAPLog(session["AccountId"], f"has unrestricted the account {Account['Username']} ({id})")
+            RAPLog(session["AccountId"], f"has unrestricted the account {Account['Username']} ({id}). Reason: {request.args.get('reason')}")
         return redirect(f"/user/edit/{id}")
     else:
         return NoPerm(session, request.path)
@@ -542,9 +542,9 @@ def Ban(id: int):
     if HasPrivilege(session["AccountId"], 5):
         Account = GetUser(id)
         if BanUser(id, request.args.get("reason")):
-            RAPLog(session["AccountId"], f"has banned the account {Account['Username']} ({id})")
+            RAPLog(session["AccountId"], f"has banned the account {Account['Username']} ({id}). Reason: {request.args.get('reason')}")
         else:
-            RAPLog(session["AccountId"], f"has unbanned the account {Account['Username']} ({id})")
+            RAPLog(session["AccountId"], f"has unbanned the account {Account['Username']} ({id}). Reason: {request.args.get('reason')}")
         return redirect(f"/user/edit/{id}")
     else:
          return NoPerm(session, request.path)

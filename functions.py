@@ -569,7 +569,7 @@ def Webhook(BeatmapId, ActionName, session):
         Logtext = "ranked"
     if ActionName == 5:
         Logtext = "loved"
-     RAPLog(session["AccountId"], f"{Logtext} the beatmap {mapa[0]} ({BeatmapId})", True)
+    RAPLog(session["AccountId"], f"{Logtext} the beatmap {mapa[0]} ({BeatmapId})", True)
     ingamemsg = f"[https://{UserConfig['ServerURL']}u/{session['AccountId']} {session['AccountName']}] {Logtext.lower()} the map [https://osu.ppy.sh/b/{BeatmapId} {mapa[0]}]"
     params = {"k": UserConfig['FokaKey'], "to": "#announce", "msg": ingamemsg}
     FokaMessage(params)
