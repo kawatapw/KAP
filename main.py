@@ -15,7 +15,7 @@ print(f" {Fore.BLUE}Running Build {GetBuild()}")
 ConsoleLog(f"RealistikPanel (Build {GetBuild()}) started!")
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24) #encrypts the session cookie
+app.secret_key = UserConfig["SecretKey"] #encrypts the session cookie
 
 @app.route("/")
 def home():
@@ -469,59 +469,16 @@ def BanchoStatus():
 #     else:
 #         return NoPerm(session, request.path)
 
-@app.route("/actions/wipe/<AccountID>")
-def Wipe(AccountID: int):
-    """The wipe action."""
-    if HasPrivilege(session["AccountId"], 11):
-        Account = GetUser(AccountID)
-        WipeAccount(AccountID)
-        RAPLog(session["AccountId"], f"has wiped the account {Account['Username']} ({AccountID})")
-        return redirect(f"/user/edit/{AccountID}")
-    else:
-        return NoPerm(session, request.path)
-
-@app.route("/actions/wipeap/<AccountID>")
-def WipeAPRoute(AccountID: int):
-    """The wipe action."""
-    if HasPrivilege(session["AccountId"], 11):
-        Account = GetUser(AccountID)
-        WipeAutopilot(AccountID)
-        RAPLog(session["AccountId"], f"has wiped the autopilot statistics for the account {Account['Username']} ({AccountID})")
-        return redirect(f"/user/edit/{AccountID}")
-    else:
-        return NoPerm(session, request.path)
-
-@app.route("/actions/wiperx/<AccountID>")
-def WipeRXRoute(AccountID: int):
-    """The wipe action."""
-    if HasPrivilege(session["AccountId"], 11):
-        Account = GetUser(AccountID)
-        WipeRelax(AccountID)
-        RAPLog(session["AccountId"], f"has wiped the relax statistics for the account {Account['Username']} ({AccountID})")
-        return redirect(f"/user/edit/{AccountID}")
-    else:
-        return NoPerm(session, request.path)
-
-@app.route("/actions/wipeva/<AccountID>")
-def WipeVARoute(AccountID: int):
-    """The wipe action."""
-    if HasPrivilege(session["AccountId"], 11):
-        Account = GetUser(AccountID)
-        WipeVanilla(AccountID)
-        RAPLog(session["AccountId"], f"has wiped the vanilla statistics for the account {Account['Username']} ({AccountID})")
-        return redirect(f"/user/edit/{AccountID}")
-    else:
-        return NoPerm(session, request.path)
-
 @app.route("/actions/restrict/<id>")
 def Restrict(id: int):
     """The wipe action."""
     if HasPrivilege(session["AccountId"], 6):
         Account = GetUser(id)
-        if ResUnTrict(id, request.args.get("note"), request.args.get("reason")):
-            RAPLog(session["AccountId"], f"has restricted the account {Account['Username']} ({id})")
+        Reason = request.args.get("reason")
+        if ResUnTrict(id, request.args.get("note"), Reason):
+            RAPLog(session["AccountId"], f"has restricted the account {Account['Username']} ({id}) {f'for {Reason}' if Reason else ''}")
         else:
-            RAPLog(session["AccountId"], f"has unrestricted the account {Account['Username']} ({id})")
+            RAPLog(session["AccountId"], f"has unrestricted the account {Account['Username']} ({id}) {f'for {Reason}' if Reason else ''}")
         return redirect(f"/user/edit/{id}")
     else:
         return NoPerm(session, request.path)
@@ -541,10 +498,11 @@ def Ban(id: int):
     """Do the FBI to the person."""
     if HasPrivilege(session["AccountId"], 5):
         Account = GetUser(id)
-        if BanUser(id, request.args.get("reason")):
-            RAPLog(session["AccountId"], f"has banned the account {Account['Username']} ({id})")
+        Reason = request.args.get("reason")
+        if BanUser(id, Reason):
+            RAPLog(session["AccountId"], f"has banned the account {Account['Username']} ({id}) {f'for {Reason}' if Reason else ''}")
         else:
-            RAPLog(session["AccountId"], f"has unbanned the account {Account['Username']} ({id})")
+            RAPLog(session["AccountId"], f"has unbanned the account {Account['Username']} ({id}) {f'for {Reason}' if Reason else ''}")
         return redirect(f"/user/edit/{id}")
     else:
          return NoPerm(session, request.path)
@@ -668,8 +626,9 @@ def WipeUser(id):
         """The wipe action."""
         if HasPrivilege(session["AccountId"], 11):
             AccountToBeWiped = GetUser(id)
+            Reason = request.form.get("wipe_reason")
             WipeAccount(request.form, session, id)
-            RAPLog(session["AccountId"], f"has wiped the user {AccountToBeWiped['Username']}")
+            RAPLog(session["AccountId"], f"has wiped the user {AccountToBeWiped['Username']} {f'for {Reason}' if Reason else ''}")
             return render_template("wipeuser.html", data=DashData(), session=session, title="Wipe User", config=UserConfig, wipes=UserWipesData(id), AccountToBeWiped = GetUser(id), success=f"User {AccountToBeWiped['Username']} has been successfully wiped!")
         else:
             return NoPerm(session, request.path)
