@@ -569,7 +569,7 @@ def Webhook(BeatmapId, ActionName, session):
         Logtext = "ranked"
     if ActionName == 5:
         Logtext = "loved"
-     RAPLog(session["AccountId"], f"{Logtext} the beatmap {mapa[0]} ({BeatmapId})", True)
+    RAPLog(session["AccountId"], f"{Logtext} the beatmap {mapa[0]} ({BeatmapId})", True)
     ingamemsg = f"[https://{UserConfig['ServerURL']}u/{session['AccountId']} {session['AccountName']}] {Logtext.lower()} the map [https://osu.ppy.sh/b/{BeatmapId} {mapa[0]}]"
     params = {"k": UserConfig['FokaKey'], "to": "#announce", "msg": ingamemsg}
     FokaMessage(params)
@@ -1112,19 +1112,19 @@ def WipeAccount(form, session, AccId):
     #     WipeRelax(AccId)
     # if UserConfig["HasAutopilot"]:
     #     WipeAutopilot(AccId)
-
+    
+    # 1 liner gang
+    ModesInt = 2 if ModesToWipe == "all" else 1 if ModesToWipe == "rx" else 0
+    
+    r.publish("ussr:wipe_user", json.dumps({ # tells ussr to remove user from lbs
+        "userID" : AccId,
+        "isRelax" : ModesInt
+    }))
+    
     # Wipe selected mode
     if ModesToWipe in ("rx", "all"):
-        r.publish("ussr:wipe_user", json.dumps({ # tells ussr to remove user from lbs
-            "userID" : AccId,
-            "isRelax" : 1
-        }))
         WipeRelax(AccId)
     if ModesToWipe in ("vn", "all"):
-        r.publish("ussr:wipe_user", json.dumps({ # tells ussr to remove user from lbs
-            "userID" : AccId,
-            "isRelax" : 0
-        }))
         WipeVanilla(AccId)
 
     # Wipe logging
@@ -1142,24 +1142,20 @@ def WipeAccount(form, session, AccId):
 
     if len(Privilege) == 0:
         return
-    Privilege = Privilege[0][0]
-    if not Privilege & 1: # restricted
-        isRestricted = True
-    else: # unrestricted
-        isRestricted = False
 
-    if currentWipes >= 3:
-        if not isRestricted:
-            # Restrict user
-            ResUnTrict(AccountId, "Automatically restricted due to wipes", "Automatically restricted due to wipes")
-            # Reset wipes count, since user is restricted
-            mycursor.execute("UPDATE users SET wipes = 0 WHERE id = %s", (AccountId,))
-            mydb.commit()
-    else:
-        if not isRestricted:
-            mycursor.execute("UPDATE users SET wipes = wipes + 1 WHERE id = %s", (AccountId,))
-            mydb.commit()
+    Privilege = Privilege[0][0]
+    isRestricted = Privilege & 1 > 0
+
+    if currentWipes % 3 == 0 and not isRestricted:
+        # Restrict user
+        ResUnTrict(AccountId, "Automatically restricted due to wipes", "Automatically restricted due to wipes")
+        # Reset wipes count, since user is restricted
+        mycursor.execute("UPDATE users SET wipes = 0 WHERE id = %s", (AccountId,))
+        mydb.commit()
+    elif not isRestricted:
         # Freeze wipe count if user is already restricted
+        mycursor.execute("UPDATE users SET wipes = wipes + 1 WHERE id = %s", (AccountId,))
+        mydb.commit()
 
 def WipeVanilla(AccId):
     """Wiped vanilla scores for user."""
