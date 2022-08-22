@@ -537,10 +537,13 @@ def Webhook(BeatmapId, ActionName, session):
     mapa = mapa[0]
     if ActionName == 0:
         TitleText = "unranked..."
+        Logtext = "Unranked"
     if ActionName == 2:
         TitleText = "ranked!"
+        Logtext = "Ranked"
     if ActionName == 5:
         TitleText = "loved!"
+        LogText = "Loved"
     webhook = DiscordWebhook(url=URL) #creates webhook
     # me trying to learn the webhook
     #EmbedJson = { #json to be sent to webhook
@@ -556,20 +559,14 @@ def Webhook(BeatmapId, ActionName, session):
     #    }
     #}
     #requests.post(URL, data=EmbedJson, headers=headers) #sends the webhook data
-    embed = DiscordEmbed(description=f"Ranked by {session['AccountName']}", color=242424) #this is giving me discord.py vibes
+    embed = DiscordEmbed(description=f"{Logtext} by {session['AccountName']}", color=242424) #this is giving me discord.py vibes
     embed.set_author(name=f"{mapa[0]} was just {TitleText}", url=f"{UserConfig['ServerURL']}b/{BeatmapId}", icon_url=f"{UserConfig['AvatarServer']}{session['AccountId']}")
     embed.set_footer(text="via RealistikPanel!")
     embed.set_image(url=f"https://assets.ppy.sh/beatmaps/{mapa[1]}/covers/cover.jpg")
     webhook.add_embed(embed)
     print(" * Posting webhook!")
     webhook.execute()
-    if ActionName == 0:
-        Logtext = "unranked"
-    if ActionName == 2:
-        Logtext = "ranked"
-    if ActionName == 5:
-        Logtext = "loved"
-    RAPLog(session["AccountId"], f"{Logtext} the beatmap {mapa[0]} ({BeatmapId})", True)
+    RAPLog(session["AccountId"], f"{Logtext.lower()} the beatmap {mapa[0]} ({BeatmapId})", True)
     ingamemsg = f"[https://{UserConfig['ServerURL']}u/{session['AccountId']} {session['AccountName']}] {Logtext.lower()} the map [https://osu.ppy.sh/b/{BeatmapId} {mapa[0]}]"
     params = {"k": UserConfig['FokaKey'], "to": "#announce", "msg": ingamemsg}
     FokaMessage(params)
