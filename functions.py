@@ -1128,7 +1128,7 @@ def WipeAccount(form, session, AccId):
 
     # Wipe counting
     mycursor.execute("SELECT wipes FROM users WHERE id = %s", (AccountId,))
-    currentWipes = mycursor.fetchone()[0]
+    currentWipes = mycursor.fetchone()[0] + 1
 
     # Check if user is currently restricted
     mycursor.execute("SELECT privileges FROM users WHERE id = %s", (AccountId,))
