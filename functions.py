@@ -2020,7 +2020,7 @@ def ChangePassword(AccountID: int, NewPassword: str):
 
 def ChangePWForm(form, session): #this function may be unnecessary but ehh
     """Handles the change password POST request."""
-    ChangePassword(form["accid"], form["newpass"])
+    ChangePassword(int(form["accid"]), form["newpass"])
     User = GetUser(form["accid"])
     RAPLog(session["AccountId"], f"has changed the password of {User['Username']} ({form['accid']})")
 
@@ -2521,3 +2521,24 @@ def ban_pages() -> int:
 
     return math.ceil(ban_count() / PAGE_SIZE)
 
+def fetch_user_banlogs(user_id: int) -> list[BanLog]:
+    """Fetches all ban logs targetting a specific user.
+
+    Args:
+        user_id (int): The target userID.
+
+    Returns:
+        list[BanLog]: A list of all banlogs for the user.
+    """
+    mycursor.execute(BAN_LOG_BASE + "WHERE to_id = %s ORDER BY b.id DESC", (user_id,))
+    
+    return [{
+        "from_id": row[0],
+        "from_name": row[1],
+        "to_id": row[2],
+        "to_name": row[3],
+        "ts": row[4],
+        "summary": row[5],
+        "detail": row[6],
+        "expity_timeago": TimeToTimeAgo(row[4])
+    } for row in mycursor]
