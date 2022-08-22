@@ -577,11 +577,8 @@ def RAPLog(UserID=999, Text="forgot to assign a text value :/", isBmap=False):
     #now we putting that in oh yea
     mycursor.execute("INSERT INTO rap_logs (userid, text, datetime, through) VALUES (%s, %s, %s, 'RealistikPanel!')", (UserID, Text, Timestamp,))
     mydb.commit()
-    # skip bmap webhook
-    if isBmap:
-        return
     #webhook time
-    if UserConfig["AdminLogWebhook"] != "":
+    if UserConfig["AdminLogWebhook"] != "" and not isBmap:
         Username = GetUser(UserID)["Username"]
         webhook = DiscordWebhook(UserConfig["AdminLogWebhook"])
         embed = DiscordEmbed(description=f"{Username} {Text}", color=242424)
