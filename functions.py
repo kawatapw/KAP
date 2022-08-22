@@ -566,29 +566,34 @@ def Webhook(BeatmapId, ActionName, session):
     webhook.add_embed(embed)
     print(" * Posting webhook!")
     webhook.execute()
-    RAPLog(session["AccountId"], f"{Logtext.lower()} the beatmap {mapa[0]} ({BeatmapId})", True)
+    global filter # Creates filter variable.
+    filter = True # Sets Filter to true because next call of raplog() posts a beatmap.
+    RAPLog(session["AccountId"], f"{Logtext.lower()} the beatmap {mapa[0]} ({BeatmapId})", True) # Message to filter
     ingamemsg = f"[https://{UserConfig['ServerURL']}u/{session['AccountId']} {session['AccountName']}] {Logtext.lower()} the map [https://osu.ppy.sh/b/{BeatmapId} {mapa[0]}]"
     params = {"k": UserConfig['FokaKey'], "to": "#announce", "msg": ingamemsg}
     FokaMessage(params)
 
-def RAPLog(UserID=999, Text="forgot to assign a text value :/", isBmap=False):
+def RAPLog(UserID=999, Text="forgot to assign a text value :/"): # Logs to admin panel + Webhook
     """Logs to the RAP log."""
     Timestamp = round(time.time())
     #now we putting that in oh yea
     mycursor.execute("INSERT INTO rap_logs (userid, text, datetime, through) VALUES (%s, %s, %s, 'RealistikPanel!')", (UserID, Text, Timestamp,))
     mydb.commit()
     # skip bmap webhook
-    if isBmap:
-        return
+
     #webhook time
     if UserConfig["AdminLogWebhook"] != "":
-        Username = GetUser(UserID)["Username"]
-        webhook = DiscordWebhook(UserConfig["AdminLogWebhook"])
-        embed = DiscordEmbed(description=f"{Username} {Text}", color=242424)
-        embed.set_footer(text="RealistikPanel Admin Logs")
-        embed.set_author(name=f"New action done by {Username}!", url=f"{UserConfig['ServerURL']}u/{UserID}", icon_url = f"{UserConfig['AvatarServer']}{UserID}")
-        webhook.add_embed(embed)
-        webhook.execute()
+        if filter == True:
+            filter = False # Sets Filter to false so that next call of raplog() doesn't filter the message.
+            return # Skips webhook.
+        else: # Posts webhook, Doesn't filter.
+            Username = GetUser(UserID)["Username"]
+            webhook = DiscordWebhook(UserConfig["AdminLogWebhook"])
+            embed = DiscordEmbed(description=f"{Username} {Text}", color=242424)
+            embed.set_footer(text="RealistikPanel Admin Logs")
+            embed.set_author(name=f"New action done by {Username}!", url=f"{UserConfig['ServerURL']}u/{UserID}", icon_url = f"{UserConfig['AvatarServer']}{UserID}")
+            webhook.add_embed(embed)
+            webhook.execute()
 
 def checkpw(dbpassword, painpassword):
     """
