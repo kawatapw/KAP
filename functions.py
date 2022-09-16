@@ -1138,7 +1138,7 @@ def WipeAccount(form, session, AccId):
         return
 
     Privilege = Privilege[0][0]
-    isRestricted = Privilege & 1 > 0
+    isRestricted = Privilege & 1 == 0
 
     if currentWipes % 3 == 0 and not isRestricted:
         # Restrict user
