@@ -1084,7 +1084,11 @@ def DeleteProfileComments(AccId):
 def DeleteUserComments(AccId):
     mycursor.execute("DELETE FROM user_comments WHERE op = %s", (AccId,))
     mydb.commit()
-
+   
+def WipeAll():
+    mycursor.execute("DELETE FROM scores")
+    mydb.commit()
+   
 def WipeAccount(form, session, AccId):
     ModesToWipe = form.get("modes_to_wipe")
     WipeReason = form.get("wipe_reason")
