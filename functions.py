@@ -1085,9 +1085,50 @@ def DeleteUserComments(AccId):
     mycursor.execute("DELETE FROM user_comments WHERE op = %s", (AccId,))
     mydb.commit()
    
-def WipeAll():
-    mycursor.execute("DELETE FROM scores")
-    mydb.commit()
+def WipeAll(): 
+    mycursor.execute("DELETE FROM scores") # Deletes all scores
+    mycursor.execute("""UPDATE
+            users_stats
+        SET
+            ranked_score_std = 0,
+            playcount_std = 0,
+            total_score_std = 0,
+            replays_watched_std = 0,
+            ranked_score_taiko = 0,
+            playcount_taiko = 0,
+            total_score_taiko = 0,
+            replays_watched_taiko = 0,
+            ranked_score_ctb = 0,
+            playcount_ctb = 0,
+            total_score_ctb = 0,
+            replays_watched_ctb = 0,
+            ranked_score_mania = 0,
+            playcount_mania = 0,
+            total_score_mania = 0,
+            replays_watched_mania = 0,
+            total_hits_std = 0,
+            total_hits_taiko = 0,
+            total_hits_ctb = 0,
+            total_hits_mania = 0,
+            level_std = 0,
+            level_taiko = 0,
+            level_ctb = 0,
+            level_mania = 0,
+            playtime_std = 0,
+            playtime_taiko = 0,
+            playtime_ctb = 0,
+            playtime_mania = 0,
+            avg_accuracy_std = 0.000000000000,
+            avg_accuracy_taiko = 0.000000000000,
+            avg_accuracy_ctb = 0.000000000000,
+            avg_accuracy_mania = 0.000000000000,
+            pp_std = 0,
+            pp_taiko = 0,
+            pp_ctb = 0,
+            pp_mania = 0
+        """) # Resets all stats    mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 0", (AccId,))
+    mycursor.execute("DELETE FROM users_beatmap_playcount") # Wipes User Playcount
+    mydb.commit() # Pushes changes to database
    
 def WipeAccount(form, session, AccId):
     ModesToWipe = form.get("modes_to_wipe")
