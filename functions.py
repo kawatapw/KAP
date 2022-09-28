@@ -257,7 +257,7 @@ def LoginHandler(username, password):
         if not IsBanned == "0" or not IsBanned:
             return False, "It seems you have been banned... Yikes..."
         else:
-            if UserID:
+            if HasPrivilege(UserID):
                 if checkpw(PassHash, password):
                     return [True, "You have been logged in!", { #creating session
                         "LoggedIn" : True,
