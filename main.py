@@ -615,6 +615,28 @@ def KickClanRoute(AccountID):
         return redirect("/clans/1")
     return NoPerm(session, request.path)
 
+@app.route("/user/wipe/all")
+def WipeAllConfirm():
+    if HasPrivilege(session["AccountId"], 11):
+        if session["AccountId"] in (1, 2, 1000):
+            return render_template(
+                "confirm.html",
+                action="wipe all users?",
+                yeslink="/actions/wipe/all",
+                nolink="/dash"
+            )
+
+    return NoPerm(session, request.path)
+
+@app.route("/actions/wipe/all")
+def WipeAllAction():
+    if HasPrivilege(session["AccountId"], 11):
+        if session["AccountId"] in (1, 2, 1000): # no kfc cus i didnt get the id (classic kfc skill issue)
+            WipeAll()
+            return render_template("dash.html", title="Dashboard", session=session, data=DashData(), plays=RecentPlays(), config=UserConfig, Graph=DashActData(), MostPlayed=GetMostPlayed(), info=f"Everyone has been wiped!")
+
+    return NoPerm(session, request.path)
+
 @app.route("/user/wipe/<id>", methods = ["GET", "POST"])
 def WipeUser(id):
     if request.method == "GET":

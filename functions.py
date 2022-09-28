@@ -22,6 +22,47 @@ from typing import TypedDict
 init() #initialises colourama for colours
 Changelogs.reverse()
 
+# he he he haw
+USER_STATS_QUERY = (
+    "UPDATE users_stats SET "
+    "ranked_score_std = 0, "
+    "playcount_std = 0, "
+    "total_score_std = 0, "
+    "replays_watched_std = 0, "
+    "ranked_score_taiko = 0, "
+    "playcount_taiko = 0, "
+    "total_score_taiko = 0, "
+    "replays_watched_taiko = 0, "
+    "ranked_score_ctb = 0, "
+    "playcount_ctb = 0, "
+    "total_score_ctb = 0, "
+    "replays_watched_ctb = 0, "
+    "ranked_score_mania = 0, "
+    "playcount_mania = 0, "
+    "total_score_mania = 0, "
+    "replays_watched_mania = 0, "
+    "total_hits_std = 0, "
+    "total_hits_taiko = 0, "
+    "total_hits_ctb = 0, "
+    "total_hits_mania = 0, "
+    "level_std = 0, "
+    "level_taiko = 0, "
+    "level_ctb = 0, "
+    "level_mania = 0, "
+    "playtime_std = 0, "
+    "playtime_taiko = 0, "
+    "playtime_ctb = 0, "
+    "playtime_mania = 0, "
+    "avg_accuracy_std = 0.000000000000, "
+    "avg_accuracy_taiko = 0.000000000000, "
+    "avg_accuracy_ctb = 0.000000000000, "
+    "avg_accuracy_mania = 0.000000000000, "
+    "pp_std = 0, "
+    "pp_taiko = 0, "
+    "pp_ctb = 0, "
+    "pp_mania = 0"
+)
+
 print(fr"""{Fore.BLUE}  _____            _ _     _   _ _    _____                 _ _ 
  |  __ \          | (_)   | | (_) |  |  __ \               | | |
  | |__) |___  __ _| |_ ___| |_ _| | _| |__) |_ _ _ __   ___| | |
@@ -216,7 +257,7 @@ def LoginHandler(username, password):
         if not IsBanned == "0" or not IsBanned:
             return False, "It seems you have been banned... Yikes..."
         else:
-            if HasPrivilege(UserID):
+            if UserID:
                 if checkpw(PassHash, password):
                     return [True, "You have been logged in!", { #creating session
                         "LoggedIn" : True,
@@ -496,8 +537,8 @@ def HasPrivilege(UserID : int, ReqPriv = 2):
 
     if result >= 1:
         return True
-    else:
-        return False
+
+    return False
 
 
 def RankBeatmap(BeatmapNumber, BeatmapId, ActionName, session):
@@ -545,20 +586,6 @@ def Webhook(BeatmapId, ActionName, session):
         TitleText = "loved!"
         LogText = "Loved"
     webhook = DiscordWebhook(url=URL) #creates webhook
-    # me trying to learn the webhook
-    #EmbedJson = { #json to be sent to webhook
-    #    "image" : f"https://assets.ppy.sh/beatmaps/{mapa[1]}/covers/cover.jpg",
-    #    "author" : {
-    #        "icon_url" : f"https://a.ussr.pl/{session['AccountId']}",
-    #        "url" : f"https://ussr.pl/b/{BeatmapId}",
-    #        "name" : f"{mapa[0]} was just {TitleText}"
-    #    },
-    #    "description" : f"Ranked by {session['AccountName']}",
-    #    "footer" : {
-    #        "text" : "via RealistikPanel!"
-    #    }
-    #}
-    #requests.post(URL, data=EmbedJson, headers=headers) #sends the webhook data
     embed = DiscordEmbed(description=f"{Logtext} by {session['AccountName']}", color=242424) #this is giving me discord.py vibes
     embed.set_author(name=f"{mapa[0]} was just {TitleText}", url=f"{UserConfig['ServerURL']}b/{BeatmapId}", icon_url=f"{UserConfig['AvatarServer']}{session['AccountId']}")
     embed.set_footer(text="via RealistikPanel!")
@@ -656,9 +683,10 @@ def IsOnline(AccountId: int) -> bool:
         Online = requests.get(url=f"{UserConfig['BanchoURL']}api/v1/isOnline?id={AccountId}").json()
         if Online["status"] == 200:
             return Online["result"]
-        else:
-            return False
-    except Exception: return False
+    except Exception: 
+        return False
+    
+    return False
 
 def CalcPP(BmapID):
     """Sends request to letsapi to calc PP for beatmap id."""
@@ -842,6 +870,7 @@ def UserData(UserID):
         Data["Notes"] = ""
     if Data["UserpageContent"] == None:
         Data["UserpageContent"] = ""
+    
     return Data
 
 def RAPFetch(page = 1):
@@ -969,6 +998,7 @@ def ApplyUserEdit(form, session):
     if not UserId or not Username:
         print("Yo you seriously messed up the form")
         raise NameError
+    
     #Creating safe username
     SafeUsername = RippleSafeUsername(Username)
 
@@ -1087,6 +1117,11 @@ def DeleteUserComments(AccId):
    
 def WipeAll():
     mycursor.execute("DELETE FROM scores")
+    mycursor.execute(USERS_STATS_QUERY)
+    mycursor.execute(USERS_STATS_QUERY.replace(
+        "users_stats",
+        "users_stats_relax"
+    ))
     mydb.commit()
    
 def WipeAccount(form, session, AccId):
@@ -1157,48 +1192,9 @@ def WipeAccount(form, session, AccId):
 
 def WipeVanilla(AccId):
     """Wiped vanilla scores for user."""
-    mycursor.execute("""UPDATE
-            users_stats
-        SET
-            ranked_score_std = 0,
-            playcount_std = 0,
-            total_score_std = 0,
-            replays_watched_std = 0,
-            ranked_score_taiko = 0,
-            playcount_taiko = 0,
-            total_score_taiko = 0,
-            replays_watched_taiko = 0,
-            ranked_score_ctb = 0,
-            playcount_ctb = 0,
-            total_score_ctb = 0,
-            replays_watched_ctb = 0,
-            ranked_score_mania = 0,
-            playcount_mania = 0,
-            total_score_mania = 0,
-            replays_watched_mania = 0,
-            total_hits_std = 0,
-            total_hits_taiko = 0,
-            total_hits_ctb = 0,
-            total_hits_mania = 0,
-            level_std = 0,
-            level_taiko = 0,
-            level_ctb = 0,
-            level_mania = 0,
-            playtime_std = 0,
-            playtime_taiko = 0,
-            playtime_ctb = 0,
-            playtime_mania = 0,
-            avg_accuracy_std = 0.000000000000,
-            avg_accuracy_taiko = 0.000000000000,
-            avg_accuracy_ctb = 0.000000000000,
-            avg_accuracy_mania = 0.000000000000,
-            pp_std = 0,
-            pp_taiko = 0,
-            pp_ctb = 0,
-            pp_mania = 0
-        WHERE
-            id = %s
-    """, (AccId,))
+    WIPE_QUERY = f"{USER_STATS_QUERY} WHERE id = %s"
+
+    mycursor.execute(WIPE_QUERY, (AccId,))
     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 0", (AccId,))
     mycursor.execute("DELETE FROM users_beatmap_playcount WHERE user_id = %s", (AccId,))
     mydb.commit()
@@ -1215,44 +1211,11 @@ def WipeVanilla(AccId):
 
 def WipeRelax(AccId):
     """Wipes the relax user data."""
-    mycursor.execute("""UPDATE
-            users_stats_relax
-        SET
-            ranked_score_std = 0,
-            playcount_std = 0,
-            total_score_std = 0,
-            ranked_score_taiko = 0,
-            playcount_taiko = 0,
-            total_score_taiko = 0,
-            ranked_score_ctb = 0,
-            playcount_ctb = 0,
-            total_score_ctb = 0,
-            ranked_score_mania = 0,
-            playcount_mania = 0,
-            total_score_mania = 0,
-            total_hits_std = 0,
-            total_hits_taiko = 0,
-            total_hits_ctb = 0,
-            total_hits_mania = 0,
-            level_std = 0,
-            level_taiko = 0,
-            level_ctb = 0,
-            level_mania = 0,
-            playtime_std = 0,
-            playtime_taiko = 0,
-            playtime_ctb = 0,
-            playtime_mania = 0,
-            avg_accuracy_std = 0.000000000000,
-            avg_accuracy_taiko = 0.000000000000,
-            avg_accuracy_ctb = 0.000000000000,
-            avg_accuracy_mania = 0.000000000000,
-            pp_std = 0,
-            pp_taiko = 0,
-            pp_ctb = 0,
-            pp_mania = 0
-        WHERE
-            id = %s
-    """, (AccId,))
+    WIPE_QUERY = "{} WHERE id = %s".format(
+        USER_STATS_QUERY.replace("users_stats", "users_stats_relax") # fuck you and your mother intellisense
+    )
+
+    mycursor.execute(WIPE_QUERY, (AccId,))
     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 1", (AccId,))
     mycursor.execute("DELETE FROM users_beatmap_playcount WHERE user_id = %s", (AccId,))
     mydb.commit()
