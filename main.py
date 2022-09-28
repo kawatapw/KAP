@@ -623,7 +623,7 @@ def WipeAllConfirm():
                 "confirm.html",
                 action="wipe all users?",
                 yeslink="/actions/wipe/all",
-                nolink="/dash"
+                backlink="/dash"
             )
 
     return NoPerm(session, request.path)
