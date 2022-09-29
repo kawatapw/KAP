@@ -240,36 +240,35 @@ def LoginHandler(username, password):
     if len(User) == 0:
         #when user not found
         return False, "The user was not found. Maybe you have made a typo?"
-    else:
-        User = User[0]
-        #Stores grabbed data in variables for easier access
-        Username = User[0]
-        PassHash = User[1]
-        IsBanned = User[2]
-        Privilege = User[3]
-        UserID = User[4]
 
-        #dont  allow the bot account to log in (in case the server has a MASSIVE loophole)
-        if UserID == 999:
-            return [False, "You may not log into the bot account."]
+    User = User[0]
+    #Stores grabbed data in variables for easier access
+    Username = User[0]
+    PassHash = User[1]
+    IsBanned = User[2]
+    Privilege = User[3]
+    UserID = User[4]
+    #dont  allow the bot account to log in (in case the server has a MASSIVE loophole)
+    if UserID == 999:
+        return [False, "You may not log into the bot account."]
 
-        #shouldve been done during conversion but eh
-        if not IsBanned == "0" or not IsBanned:
-            return False, "It seems you have been banned... Yikes..."
-        else:
-            if HasPrivilege(UserID):
-                if checkpw(PassHash, password):
-                    return [True, "You have been logged in!", { #creating session
-                        "LoggedIn" : True,
-                        "AccountId" : UserID,
-                        "AccountName" : Username,
-                        "Privilege" : Privilege,
-                        "exp" : datetime.datetime.utcnow() + datetime.timedelta(hours=2) #so the token expires
-                    }]
-                else:
-                    return False, "The password you have entered is incorrect!"
-            else:
-                return False, "The account you are attempting to log into is missing the appropriate privileges to carry out this action!"
+    #shouldve been done during conversion but eh
+    if not IsBanned == "0" or not IsBanned:
+        return False, "It seems you have been banned... Yikes..."
+
+    if HasPrivilege(UserID):
+        if checkpw(PassHash, password):
+            return [True, "You have been logged in!", { #creating session
+                "LoggedIn" : True,
+                "AccountId" : UserID,
+                "AccountName" : Username,
+                "Privilege" : Privilege,
+                "exp" : datetime.datetime.utcnow() + datetime.timedelta(hours=2) #so the token expires
+            }]
+
+        return False, "The password you have entered is incorrect!"
+
+    return False, "The account you are attempting to log into is missing the appropriate privileges to carry out this action!"
 
 def TimestampConverter(timestamp, NoDate=1):
     """Converts timestamps into readable time."""
@@ -1009,13 +1008,28 @@ def ApplyUserEdit(form, session):
     #stop people ascending themselves
     #OriginalPriv = int(session["Privilege"])
     FromID = session["AccountId"]
-    if int(UserId) == FromID:
+    if UserId == FromID:
         mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,))
         OriginalPriv = mycursor.fetchall()
         if len(OriginalPriv) == 0:
             return
+
         OriginalPriv = OriginalPriv[0][0]
+
         if int(Privilege) > OriginalPriv:
+            return
+    else:
+        mycursor.execute("SELECT privileges FROM users WHERE id = %s", (UserId,))
+        mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,))
+        UserPrivs = mycursor.fetchall()
+
+        if len(UserPrivs) == 0:
+            return
+
+        EditedPriv = UserPrivs[0][0]
+        SelfPriv = UserPrivs[0][1]
+
+        if int(EditedPriv) > SelfPriv:
             return
 
     mycursor.execute("SELECT username FROM users WHERE id = %s", (UserId,))
@@ -1117,8 +1131,8 @@ def DeleteUserComments(AccId):
    
 def WipeAll():
     mycursor.execute("DELETE FROM scores")
-    mycursor.execute(USERS_STATS_QUERY)
-    mycursor.execute(USERS_STATS_QUERY.replace(
+    mycursor.execute(USER_STATS_QUERY)
+    mycursor.execute(USER_STATS_QUERY.replace(
         "users_stats",
         "users_stats_relax"
     ))
@@ -1211,9 +1225,7 @@ def WipeVanilla(AccId):
 
 def WipeRelax(AccId):
     """Wipes the relax user data."""
-    WIPE_QUERY = "{} WHERE id = %s".format(
-        USER_STATS_QUERY.replace("users_stats", "users_stats_relax") # fuck you and your mother intellisense
-    )
+    WIPE_QUERY = f"{USER_STATS_QUERY.replace('users_stats', 'users_stats_relax')} WHERE id = %s"
 
     mycursor.execute(WIPE_QUERY, (AccId,))
     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 1", (AccId,))
