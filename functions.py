@@ -1006,7 +1006,7 @@ def ApplyUserEdit(form, session):
     if UserPage == "":
         UserPage = None
 
-    #stop people ascending themselves
+    #stop people ascending themselves or other people privs higher than theirs
     #OriginalPriv = int(session["Privilege"])
     FromID = session["AccountId"]
     if int(UserId) == FromID:
@@ -1016,6 +1016,13 @@ def ApplyUserEdit(form, session):
             return
         OriginalPriv = OriginalPriv[0][0]
         if int(Privilege) > OriginalPriv:
+            RAPLog(session f"Attempted to set their own privilege to {Privilege}: (Original: {OriginalPriv})") # Snitch on them
+            return
+    elif int(UserId) != FromID: # The user is not editing themselves
+        mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,)) # Get the mod's privileges
+        Modpriv = mycursor.fetchall() # Set those to a variable
+        if int(Privilege) > Modpriv: # if privelages from edit user form are greater than the mod's privileges
+            RAPLog(session["AccountId"], f"Attempted to give user {UserId} the following privileges: {Privilege} (higher than their own privileges: {Modpriv})") # Snitch on them
             return
 
     mycursor.execute("SELECT username FROM users WHERE id = %s", (UserId,))
