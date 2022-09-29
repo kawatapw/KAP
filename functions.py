@@ -1016,7 +1016,7 @@ def ApplyUserEdit(form, session):
             return # Don't allow them to change the privelages of a user
         OriginalPriv = OriginalPriv[0][0] 
         if int(Privilege) > OriginalPriv: # if the mod is trying to set to themselves is higher than the privelage they already have
-            RAPLog(session f"Attempted to set their own privilege to {Privilege}: (Original: {OriginalPriv})") # Snitch on them in admin log, so people realise somthing.
+            RAPLog(session["AccountId"], f"Attempted to set their own privilege to {Privilege}: (Original: {OriginalPriv})") # Snitch on them in admin log, so people realise somthing.
             return # Don't allow them to change privelages
     elif int(UserId) != FromID: # The user is editing another user
         mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,)) # Get the mod's privileges
