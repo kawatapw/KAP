@@ -1008,22 +1008,28 @@ def ApplyUserEdit(form, session):
 
     #stop people ascending themselves or other people privs higher than theirs
     #OriginalPriv = int(session["Privilege"])
-    FromID = session["AccountId"]
-    if int(UserId) == FromID:
-        mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,))
-        OriginalPriv = mycursor.fetchall()
-        if len(OriginalPriv) == 0:
-            return
-        OriginalPriv = OriginalPriv[0][0]
-        if int(Privilege) > OriginalPriv:
-            RAPLog(session f"Attempted to set their own privilege to {Privilege}: (Original: {OriginalPriv})") # Snitch on them
-            return
-    elif int(UserId) != FromID: # The user is not editing themselves
+    FromID = session["AccountId"] # Set Variable FromID to the current mod's ID
+    if int(UserId) == FromID: # If the user being edited is the mod
+        mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,)) # Grab mod's Database Privleges
+        OriginalPriv = mycursor.fetchall() # Set those privelages to OriginalPriv
+        if len(OriginalPriv) == 0: # If the permissions are 0 - meaning they should not be in the panel
+            return # Don't allow them to change the privelages of a user
+        OriginalPriv = OriginalPriv[0][0] 
+        if int(Privilege) > OriginalPriv: # if the mod is trying to set to themselves is higher than the privelage they already have
+            RAPLog(session f"Attempted to set their own privilege to {Privilege}: (Original: {OriginalPriv})") # Snitch on them in admin log, so people realise somthing.
+            return # Don't allow them to change privelages
+    elif int(UserId) != FromID: # The user is editing another user
         mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,)) # Get the mod's privileges
         Modpriv = mycursor.fetchall() # Set those to a variable
-        if int(Privilege) > Modpriv: # if privelages from edit user form are greater than the mod's privileges
-            RAPLog(session["AccountId"], f"Attempted to give user {UserId} the following privileges: {Privilege} (higher than their own privileges: {Modpriv})") # Snitch on them
+        if int(Privilege) > Modpriv: # if privelages that the mod is trying to set to another user is higher than the mods privelages
+            RAPLog(session["AccountId"], f"Attempted to give user {UserId} the following privileges: {Privilege} (higher than their own privileges: {Modpriv})") # Snitch on them in #admin-log, so people can realise somthing
             return
+# Users CAN edit themselves, just can't give themselves higher privelages than what they already have.
+# This was already Implemented.
+# This addition prevents mods from giving OTHER users privlages higher than their own.
+# This way, users can't create alts and give them full privelages.
+# or, give users privelages higher than their own.
+# like me giving KFC back his full perms after banning him.
 
     mycursor.execute("SELECT username FROM users WHERE id = %s", (UserId,))
     OriginalUsername = mycursor.fetchone()[0]
