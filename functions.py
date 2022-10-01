@@ -28,19 +28,15 @@ USER_STATS_QUERY = (
     "ranked_score_std = 0, "
     "playcount_std = 0, "
     "total_score_std = 0, "
-    "replays_watched_std = 0, "
     "ranked_score_taiko = 0, "
     "playcount_taiko = 0, "
     "total_score_taiko = 0, "
-    "replays_watched_taiko = 0, "
     "ranked_score_ctb = 0, "
     "playcount_ctb = 0, "
     "total_score_ctb = 0, "
-    "replays_watched_ctb = 0, "
     "ranked_score_mania = 0, "
     "playcount_mania = 0, "
     "total_score_mania = 0, "
-    "replays_watched_mania = 0, "
     "total_hits_std = 0, "
     "total_hits_taiko = 0, "
     "total_hits_ctb = 0, "
@@ -1206,7 +1202,14 @@ def WipeAccount(form, session, AccId):
 
 def WipeVanilla(AccId):
     """Wiped vanilla scores for user."""
-    WIPE_QUERY = f"{USER_STATS_QUERY} WHERE id = %s"
+    WIPE_QUERY = (
+        USER_STATS_QUERY + ", "
+        "replays_watched_std = 0, " 
+        "replays_watched_taiko = 0, " 
+        "replays_watched_ctb = 0, " 
+        "replays_watched_mania = 0 " 
+        "WHERE id = %s"
+    )
 
     mycursor.execute(WIPE_QUERY, (AccId,))
     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 0", (AccId,))
@@ -1667,6 +1670,15 @@ def GetMostPlayed():
     """Gets the beatmap with the highest playcount."""
     mycursor.execute("SELECT beatmap_id, song_name, beatmapset_id, playcount FROM beatmaps ORDER BY playcount DESC LIMIT 1")
     Beatmap = mycursor.fetchone()
+
+    if Beatmap is None:
+        return {
+            "BeatmapId": 75,
+            "SongName": "Kenji Ninuma - DISCO PRINCE",
+            "Cover": "https://assets.ppy.sh/beatmaps/1/covers/cover.jpg",
+            "Playcount": 1337
+        }
+
     return {
         "BeatmapId" : Beatmap[0],
         "SongName" : Beatmap[1],

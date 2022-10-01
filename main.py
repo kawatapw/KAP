@@ -165,7 +165,7 @@ def SystemSettings():
 def EditUser(id):
     if request.method == "GET":
         if HasPrivilege(session["AccountId"], 6):
-            return render_template("edituser.html", data=DashData(), session=session, title="Edit User", config=UserConfig, UserData=UserData(id), Privs = GetPrivileges(), UserBadges= GetUserBadges(id), badges=GetBadges(), ShowIPs = HasPrivilege(session["AccountId"], 16), ban_logs = fetch_user_banlogs(int(id)))
+            return render_template("edituser.html", data=DashData(), session=session, title="Edit User", config=UserConfig, UserData=UserData(id), Privs = GetPrivileges(), UserBadges= GetUserBadges(id), badges=GetBadges(), ShowIPs = HasPrivilege(session["AccountId"], 16), ban_logs = None) #fetch_user_banlogs(int(id)))
         else:
              return NoPerm(session, request.path)
     if request.method == "POST":
@@ -618,9 +618,13 @@ def KickClanRoute(AccountID):
 @app.route("/user/wipe/all")
 def WipeAllConfirm():
     if HasPrivilege(session["AccountId"], 11):
-        if session["AccountId"] in (1, 2, 1000):
+        if session["AccountId"] in (1, 2, 1000, 13233):
             return render_template(
                 "confirm.html",
+                data=DashData(), 
+                session=session, 
+                title="Confirmation Required", 
+                config=UserConfig,
                 action="wipe all users?",
                 yeslink="/actions/wipe/all",
                 backlink="/dash"
@@ -631,7 +635,7 @@ def WipeAllConfirm():
 @app.route("/actions/wipe/all")
 def WipeAllAction():
     if HasPrivilege(session["AccountId"], 11):
-        if session["AccountId"] in (1, 2, 1000): # no kfc cus i didnt get the id (classic kfc skill issue)
+        if session["AccountId"] in (1, 2, 1000, 13233):
             WipeAll()
             return render_template("dash.html", title="Dashboard", session=session, data=DashData(), plays=RecentPlays(), config=UserConfig, Graph=DashActData(), MostPlayed=GetMostPlayed(), info=f"Everyone has been wiped!")
 
