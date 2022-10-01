@@ -615,10 +615,10 @@ def KickClanRoute(AccountID):
         return redirect("/clans/1")
     return NoPerm(session, request.path)
 
-@app.route("/user/wipe/all")
+@app.route("/user/wipeall")
 def WipeAllConfirm():
     if HasPrivilege(session["AccountId"], 11):
-        if session["AccountId"] in (1, 2, 1000, 13233):
+        if session["AccountId"] in (1, 2, 1000, 13233, 13233):
             return render_template(
                 "confirm.html",
                 data=DashData(), 
@@ -626,13 +626,13 @@ def WipeAllConfirm():
                 title="Confirmation Required", 
                 config=UserConfig,
                 action="wipe all users?",
-                yeslink="/actions/wipe/all",
+                yeslink="/actions/wipeall/confirm",
                 backlink="/dash"
             )
 
     return NoPerm(session, request.path)
 
-@app.route("/actions/wipe/all")
+@app.route("/actions/wipeall/confirm")
 def WipeAllAction():
     if HasPrivilege(session["AccountId"], 11):
         if session["AccountId"] in (1, 2, 1000, 13233):
