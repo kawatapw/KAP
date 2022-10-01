@@ -62,7 +62,9 @@ USER_STATS_QUERY = ("""UPDATE
         pp_taiko = 0,
         pp_ctb = 0,
         pp_mania = 0
-        """)
+    WHERE
+        id = %s
+    """)
 
 print(fr"""{Fore.BLUE}  _____            _ _     _   _ _    _____                 _ _ 
  |  __ \          | (_)   | | (_) |  |  __ \               | | |
@@ -1207,7 +1209,7 @@ def WipeAccount(form, session, AccId):
 
 def WipeVanilla(AccId):
     """Wiped vanilla scores for user."""
-    WIPE_QUERY = f"{USER_STATS_QUERY} WHERE id = %s"
+    WIPE_QUERY = f"{USER_STATS_QUERY}"
 
     mycursor.execute(WIPE_QUERY, (AccId,))
     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 0", (AccId,))
@@ -1226,7 +1228,7 @@ def WipeVanilla(AccId):
 
 def WipeRelax(AccId):
     """Wipes the relax user data."""
-    WIPE_QUERY = f"{USER_STATS_QUERY.replace('users_stats', 'users_stats_relax')} WHERE id = %s"
+    WIPE_QUERY = f"{USER_STATS_QUERY.replace('users_stats', 'users_stats_relax')}"
 
     mycursor.execute(WIPE_QUERY, (AccId,))
     mycursor.execute("DELETE FROM scores WHERE userid = %s AND is_relax = 1", (AccId,))
