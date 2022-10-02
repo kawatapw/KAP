@@ -1024,7 +1024,7 @@ def ApplyUserEdit(form, session):
         EditedPriv = UserPrivs[0][0]
         SelfPriv = UserPrivs[1][0]
 
-        if int(EditedPriv) > SelfPriv:
+        if int(EditedPriv) > SelfPriv and Privilege > SelfPriv:
             return
 
     mycursor.execute("SELECT username FROM users WHERE id = %s", (UserId,))
