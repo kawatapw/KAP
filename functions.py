@@ -1015,15 +1015,14 @@ def ApplyUserEdit(form, session):
         if int(Privilege) > OriginalPriv:
             return
     else:
-        mycursor.execute("SELECT privileges FROM users WHERE id = %s", (UserId,))
-        mycursor.execute("SELECT privileges FROM users WHERE id = %s", (FromID,))
+        mycursor.execute("SELECT privileges FROM users WHERE id = %s OR id = %s", (UserId, FromID))
         UserPrivs = mycursor.fetchall()
 
         if len(UserPrivs) == 0:
             return
 
         EditedPriv = UserPrivs[0][0]
-        SelfPriv = UserPrivs[0][1]
+        SelfPriv = UserPrivs[1][0]
 
         if int(EditedPriv) > SelfPriv:
             return
