@@ -982,7 +982,7 @@ def ApplyUserEdit(form, session):
     Country = form.get("country", False)
     UserPage = form.get("userpage", False)
     Notes = form.get("notes", False)
-    Privilege = form.get("privilege", False)
+    Privilege = int(form.get("privilege", False))
     HWIDBypass = form.get("hwid_bypass", False) == "1"
     Wipes = int(form.get("wipes", False))
 
@@ -1024,7 +1024,7 @@ def ApplyUserEdit(form, session):
         EditedPriv = UserPrivs[0][0]
         SelfPriv = UserPrivs[1][0]
 
-        if int(EditedPriv) > SelfPriv and Privilege > SelfPriv:
+        if EditedPriv > SelfPriv and Privilege > SelfPriv:
             return
 
     mycursor.execute("SELECT username FROM users WHERE id = %s", (UserId,))
