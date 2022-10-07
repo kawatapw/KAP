@@ -579,7 +579,7 @@ def Webhook(BeatmapId, ActionName, session):
         Logtext = "Ranked"
     if ActionName == 5:
         TitleText = "loved!"
-        LogText = "Loved"
+        Logtext = "Loved"
     webhook = DiscordWebhook(url=URL) #creates webhook
     embed = DiscordEmbed(description=f"{Logtext} by {session['AccountName']}", color=242424) #this is giving me discord.py vibes
     embed.set_author(name=f"{mapa[0]} was just {TitleText}", url=f"{UserConfig['ServerURL']}b/{BeatmapId}", icon_url=f"{UserConfig['AvatarServer']}{session['AccountId']}")
