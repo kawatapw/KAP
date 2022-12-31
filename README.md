@@ -1,5 +1,5 @@
-# RealistikPanel!
-The modern admin panel for osu! private servers!
+# KawataAdminPanel!
+The modern admin panel for osu! private servers Founded by RealistikDash! Modified for use on Kawata.
 
 ![Dashboard](https://i.imgur.com/GidGUqS.png)
 
@@ -13,7 +13,7 @@ This may be reflected in the quality of the code. I will try to fix up or replac
 
 **I am planning on rewriting this at some point in the future due to me looking back and realising how bad it is...**
 
-This project is now ready to be deployed as a full replacement to RAP.
+This project is now ready to be deployed as a full replacement to RAP(Ripple Admin Panel).
 
 # Feature set
 Everyday tons of new features
@@ -34,7 +34,7 @@ Everyday tons of new features
 Almost everything RAP has to offer and more!
 
 # Support
-To get help, report bugs or suggest features, feel free to either create a GitHub issue or contact **RealistikDash#0077** on Discord and I will happily help you.
+To get help, report bugs or suggest features, feel free to either create a GitHub issue or contact **RealistikDash#0077** on Discord and I will happily help you. If you are having issues with KAP in specific please contact one of the developers at ![Kawata](https://discord.gg/4CzsqkK).
 
 RealistikPanel has been tested on a VPS running Ubuntu, Python 3.6.9 and Ainu database.
 
